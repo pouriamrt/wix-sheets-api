@@ -1,0 +1,559 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      /* Force correct order immediately */
+      .wrap > .sidebar { order: 1 !important; }
+      .wrap > .resultsContainer { order: 2 !important; }
+    </style>
+    <style>
+      :root {
+        --border: #e5e7eb;
+        --muted: #6b7280;
+        --bg: #ffffff;
+        --chip: #f3f4f6;
+        --primary: #2563eb;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        background: var(--bg);
+        color: #111827;
+      }
+
+      .wrap {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 16px;
+        padding: 16px;
+      }
+
+      /* Results */
+      .resultsHeader {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+      .count {
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .cards {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .card {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 14px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+      }
+      .card h3 {
+        margin: 0 0 6px 0;
+        font-size: 20px;
+        line-height: 1.2;
+      }
+      .meta {
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.4;
+        white-space: pre-line;
+      }
+      .grid3 {
+        margin-top: 10px;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 8px 12px;
+      }
+      .kv b { display:block; font-size: 13px; margin-bottom: 4px; }
+      .kv .v { color: #111827; font-size: 14px; white-space: pre-line; }
+
+      .logo {
+        width: 110px;
+        height: 70px;
+        object-fit: contain;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 6px;
+        background: #fff;
+      }
+      .btn {
+        margin-top: 10px;
+        display: inline-block;
+        background: var(--primary);
+        color: #fff;
+        text-decoration: none;
+        padding: 10px 12px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      /* Filters */
+      .sidebar {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px;
+        position: relative;
+        height: auto;
+        overflow: visible;
+        order: 1 !important;
+      }
+      
+      /* Results container */
+      .resultsContainer {
+        order: 2 !important;
+      }
+      .sidebar h2 {
+        margin: 6px 0 10px 0;
+        font-size: 18px;
+      }
+      .controls {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+      .controls button {
+        border: 1px solid var(--border);
+        background: #fff;
+        padding: 8px 10px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .controls button.primary {
+        background: var(--primary);
+        color: #fff;
+        border-color: var(--primary);
+      }
+
+      .filterBlock {
+        border-top: 1px solid var(--border);
+        padding-top: 10px;
+        margin-top: 10px;
+      }
+
+      select, input[type="text"] {
+        width: 100%;
+        padding: 9px 10px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        font-size: 14px;
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 8px 0 0 0;
+      }
+      .chip {
+        background: var(--chip);
+        border: 1px solid var(--border);
+        padding: 6px 8px;
+        border-radius: 999px;
+        font-size: 12px;
+        cursor: pointer;
+      }
+
+      .checklist {
+        margin-top: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        max-height: 220px;
+        overflow: auto;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 8px;
+      }
+      label {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        font-size: 14px;
+      }
+      .muted { color: var(--muted); font-size: 13px; }
+      .smallBtn {
+        margin-top: 8px;
+        border: 1px solid var(--border);
+        background: #fff;
+        padding: 8px 10px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 600;
+        width: 100%;
+      }
+
+      @media (max-width: 980px) {
+        .grid3 { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      // Immediately enforce correct order
+      (function() {
+        const style = document.createElement('style');
+        style.textContent = `
+          .wrap { display: flex !important; flex-direction: column !important; }
+          .wrap > .sidebar { order: 1 !important; }
+          .wrap > .resultsContainer { order: 2 !important; }
+        `;
+        document.head.appendChild(style);
+      })();
+    </script>
+    <div class="wrap">
+      <aside class="sidebar">
+        <h2>Filters</h2>
+        <div class="controls">
+          <button class="primary" id="addFilter">Add Filter</button>
+          <button id="clearAll">Clear</button>
+        </div>
+        <div class="muted">Add multiple filters. Columns are ANDed. Values in a filter are ORed.</div>
+        <div id="filters"></div>
+      </aside>
+
+      <div class="resultsContainer">
+        <div class="resultsHeader">
+          <div class="count" id="count">Waiting for data…</div>
+          <div class="count" id="activeFilters"></div>
+        </div>
+        <div class="cards" id="cards"></div>
+      </div>
+    </div>
+
+    <script>
+      // ---------------- State ----------------
+      let rows = [];
+      let headers = [];
+      let filters = []; // [{id, col, selected:Set, search:""}]
+      let nextId = 1;
+
+      // Map your real sheet headers to card fields:
+      // If your headers differ, change these keys.
+      // This can be overridden by Wix via SET_CARD_MAP message
+      const CARD_MAP = {
+        title: ["Organization Name"],
+        address: ["Region", "Country"],
+        services: ["Services / Resources"],
+        cost: ["Scope"],
+        funding: ["Type", "Population Served"],
+        logo: [],
+        url: ["Website"]
+      };
+
+      // If you have multi-valued cells like "English, French"
+      function splitCellValues(v) {
+        if (v === null || v === undefined) return [];
+        const s = String(v).trim();
+        if (!s) return [];
+        return s.split(/[,;|]/g).map(x => x.trim()).filter(Boolean);
+      }
+
+      function getFirstKey(row, candidates) {
+        for (const k of candidates) {
+          if (row[k] !== undefined && row[k] !== null && String(row[k]).trim() !== "") return k;
+        }
+        return null;
+      }
+
+      function pick(row, candidates) {
+        const k = getFirstKey(row, candidates);
+        return k ? row[k] : "";
+      }
+
+      // Combine multiple address fields (e.g., Region + Country)
+      function pickAddress(row, candidates) {
+        const parts = [];
+        for (const k of candidates) {
+          if (row[k] !== undefined && row[k] !== null && String(row[k]).trim() !== "") {
+            parts.push(String(row[k]).trim());
+          }
+        }
+        return parts.join(", ");
+      }
+
+      function bulletize(arr) {
+        if (!arr || arr.length === 0) return "";
+        return arr.map(x => `• ${x}`).join("\n");
+      }
+
+      // ---------------- Filtering logic ----------------
+      function rowMatchesAllFilters(row) {
+        for (const f of filters) {
+          if (!f.col) continue;
+          if (!f.selected || f.selected.size === 0) continue;
+
+          const cell = row[f.col];
+          if (cell === null || cell === undefined) return false;
+
+          // token match OR whole-cell match (case-insensitive)
+          const tokens = splitCellValues(cell).map(x => x.toLowerCase());
+          const full = String(cell).toLowerCase();
+
+          let ok = false;
+          for (const sel of f.selected) {
+            const q = String(sel).toLowerCase();
+            if (tokens.includes(q) || full === q) { ok = true; break; }
+          }
+          if (!ok) return false;
+        }
+        return true;
+      }
+
+      function getFilteredRows() {
+        return rows.filter(rowMatchesAllFilters);
+      }
+
+      // ---------------- Facet building per column ----------------
+      function uniqueValuesForColumn(col) {
+        const uniq = new Set();
+        for (const r of rows) {
+          const cell = r[col];
+          for (const t of splitCellValues(cell)) uniq.add(t);
+        }
+        return Array.from(uniq).sort((a, b) => a.localeCompare(b, undefined, {numeric:true, sensitivity:"base"}));
+      }
+
+      // ---------------- UI rendering ----------------
+      function render() {
+        const filtered = getFilteredRows();
+        document.getElementById("count").textContent = `${filtered.length} results`;
+
+        const active = filters
+          .filter(f => f.col && f.selected && f.selected.size > 0)
+          .map(f => `${f.col}: ${Array.from(f.selected).slice(0,3).join(", ")}${f.selected.size>3 ? "…" : ""}`);
+        document.getElementById("activeFilters").textContent = active.length ? `Active: ${active.join(" | ")}` : "";
+
+        renderCards(filtered);
+        renderFilters();
+      }
+
+      function renderCards(list) {
+        const el = document.getElementById("cards");
+        el.innerHTML = "";
+
+        for (const r of list) {
+          const title = pick(r, CARD_MAP.title) || "(No name)";
+          const address = pickAddress(r, CARD_MAP.address);
+          const services = bulletize(splitCellValues(pick(r, CARD_MAP.services)));
+          const cost = bulletize(splitCellValues(pick(r, CARD_MAP.cost)));
+          const funding = bulletize(splitCellValues(pick(r, CARD_MAP.funding)));
+          const logo = pick(r, CARD_MAP.logo);
+          const url = pick(r, CARD_MAP.url);
+
+          const card = document.createElement("div");
+          card.className = "card";
+
+          const left = document.createElement("div");
+          left.innerHTML = `
+            <h3>${escapeHtml(String(title))}</h3>
+            <div class="meta">${escapeHtml(String(address || ""))}</div>
+            <div class="grid3">
+              <div class="kv">
+                <b>Services</b>
+                <div class="v">${escapeHtml(services)}</div>
+              </div>
+              <div class="kv">
+                <b>Cost</b>
+                <div class="v">${escapeHtml(cost)}</div>
+              </div>
+              <div class="kv">
+                <b>Funding Type</b>
+                <div class="v">${escapeHtml(funding)}</div>
+              </div>
+            </div>
+            ${url ? `<a class="btn" href="${escapeAttr(url)}" target="_blank" rel="noopener">See More</a>` : ""}
+          `;
+
+          const right = document.createElement("div");
+          if (logo) {
+            const img = document.createElement("img");
+            img.className = "logo";
+            img.src = logo;
+            img.alt = "logo";
+            right.appendChild(img);
+          }
+
+          card.appendChild(left);
+          card.appendChild(right);
+          el.appendChild(card);
+        }
+      }
+
+      function renderFilters() {
+        const root = document.getElementById("filters");
+        root.innerHTML = "";
+
+        for (const f of filters) {
+          const block = document.createElement("div");
+          block.className = "filterBlock";
+
+          // Column select
+          const colSelect = document.createElement("select");
+          const opt0 = document.createElement("option");
+          opt0.value = "";
+          opt0.textContent = "Choose column…";
+          colSelect.appendChild(opt0);
+
+          for (const h of headers) {
+            const o = document.createElement("option");
+            o.value = h;
+            o.textContent = h;
+            if (f.col === h) o.selected = true;
+            colSelect.appendChild(o);
+          }
+
+          colSelect.addEventListener("change", () => {
+            f.col = colSelect.value;
+            f.selected = new Set();
+            f.search = "";
+            render(); // rebuild values list
+          });
+
+          // Search box for values
+          const search = document.createElement("input");
+          search.type = "text";
+          search.placeholder = "Search values…";
+          search.value = f.search || "";
+          search.addEventListener("input", () => {
+            f.search = search.value;
+            renderFilters(); // update only filter list
+          });
+
+          // Values checklist
+          const checklist = document.createElement("div");
+          checklist.className = "checklist";
+
+          if (!f.col) {
+            const p = document.createElement("div");
+            p.className = "muted";
+            p.textContent = "Pick a column to see values.";
+            checklist.appendChild(p);
+          } else {
+            const allValues = uniqueValuesForColumn(f.col);
+            const q = (f.search || "").trim().toLowerCase();
+            const shown = q ? allValues.filter(v => v.toLowerCase().includes(q)) : allValues;
+
+            for (const v of shown) {
+              const lab = document.createElement("label");
+              const cb = document.createElement("input");
+              cb.type = "checkbox";
+              cb.checked = f.selected.has(v);
+              cb.addEventListener("change", () => {
+                if (cb.checked) f.selected.add(v);
+                else f.selected.delete(v);
+                render();
+              });
+
+              const span = document.createElement("span");
+              span.textContent = v;
+              lab.appendChild(cb);
+              lab.appendChild(span);
+              checklist.appendChild(lab);
+            }
+
+            if (shown.length === 0) {
+              const p = document.createElement("div");
+              p.className = "muted";
+              p.textContent = "No values match your search.";
+              checklist.appendChild(p);
+            }
+          }
+
+          // Selected chips
+          const chips = document.createElement("div");
+          chips.className = "chips";
+          for (const v of Array.from(f.selected)) {
+            const chip = document.createElement("div");
+            chip.className = "chip";
+            chip.textContent = `${v} ×`;
+            chip.addEventListener("click", () => {
+              f.selected.delete(v);
+              render();
+            });
+            chips.appendChild(chip);
+          }
+
+          // Remove filter button
+          const removeBtn = document.createElement("button");
+          removeBtn.className = "smallBtn";
+          removeBtn.textContent = "Remove this filter";
+          removeBtn.addEventListener("click", () => {
+            filters = filters.filter(x => x.id !== f.id);
+            if (filters.length === 0) addFilter();
+            render();
+          });
+
+          block.appendChild(colSelect);
+          block.appendChild(search);
+          block.appendChild(checklist);
+          if (f.selected.size > 0) block.appendChild(chips);
+          block.appendChild(removeBtn);
+          root.appendChild(block);
+        }
+      }
+
+      function addFilter() {
+        filters.push({ id: `f${nextId++}`, col: "", selected: new Set(), search: "" });
+      }
+
+      // ---------------- Messaging with Wix ----------------
+      window.onmessage = (event) => {
+        const msg = event.data;
+        if (!msg || typeof msg !== "object") return;
+
+        if (msg.type === "INIT_DATA") {
+          rows = Array.isArray(msg.rows) ? msg.rows : [];
+          headers = Array.isArray(msg.headers) ? msg.headers : Object.keys(rows[0] || {});
+          if (filters.length === 0) addFilter();
+          render();
+        }
+
+        if (msg.type === "SET_CARD_MAP") {
+          // optional: allow Velo to override mapping
+          Object.assign(CARD_MAP, msg.map || {});
+          render();
+        }
+      };
+
+      // Send events to Wix (optional)
+      function notifyWixFilters() {
+        const payload = filters.map(f => ({
+          col: f.col,
+          values: Array.from(f.selected || [])
+        }));
+        parent.postMessage({ type: "FILTERS_CHANGED", filters: payload }, "*");
+      }
+
+      // Hook top buttons
+      document.getElementById("addFilter").addEventListener("click", () => {
+        addFilter();
+        render();
+      });
+
+      document.getElementById("clearAll").addEventListener("click", () => {
+        filters = [{ id: `f${nextId++}`, col: "", selected: new Set(), search: "" }];
+        render();
+      });
+
+      // Basic escaping
+      function escapeHtml(s) {
+        return String(s || "").replace(/[&<>"']/g, (c) => ({
+          "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+        }[c]));
+      }
+      function escapeAttr(s) {
+        return String(s || "").replace(/"/g, "%22");
+      }
+    </script>
+  </body>
+</html>
