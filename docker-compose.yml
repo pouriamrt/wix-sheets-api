@@ -1,0 +1,22 @@
+# Wix Backend - FastAPI + Google Sheets API
+#
+# Prerequisites:
+#   1. Create .env with SHEET_ID (and optionally DEFAULT_RANGE).
+#   2. Place your Google service account JSON at ./credentials.json
+#      (or set the path in the volume below).
+#
+# Run:  docker compose up --build
+
+services:
+  wix-backend:
+    build: .
+    container_name: wix-backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      GOOGLE_APPLICATION_CREDENTIALS: /app/credentials.json
+    volumes:
+      - ./keys/wix-project-485002-df6702b3ed76.json:/app/credentials.json:ro
+    restart: unless-stopped
