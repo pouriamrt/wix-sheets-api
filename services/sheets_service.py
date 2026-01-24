@@ -115,6 +115,23 @@ class SheetsService:
         mapped = [row_to_obj(r) for r in data_rows if any(cell != "" for cell in r)]
         return {"rows": mapped, "headers": headers, "raw": values}
 
+    def update_sheet(self, range_: str, value: List[List[Any]]):
+        """Append values to the end of the sheet."""
+        try:
+            service = self._get_service()
+            service.spreadsheets().values().append(
+                spreadsheetId=self.settings.sheet_id,
+                range=range_,
+                valueInputOption="USER_ENTERED",
+                insertDataOption="INSERT_ROWS",
+                body={"values": value},
+            ).execute()
+            return {"message": "Sheet updated successfully", "range": range_}
+        except HttpError as e:
+            raise HTTPException(status_code=502, detail=f"Google Sheets API error: {e}")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
 
 # Global service instance
 _sheets_service: SheetsService | None = None

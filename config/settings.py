@@ -18,9 +18,7 @@ class Settings:
         )
         self.sheet_id: str = os.getenv("SHEET_ID", "")
         self.default_range: str = os.getenv("DEFAULT_RANGE", "Sheet1!A:Z")
-        self.scopes: list[str] = [
-            "https://www.googleapis.com/auth/spreadsheets.readonly"
-        ]
+        self.scopes: list[str] = ["https://www.googleapis.com/auth/spreadsheets"]
 
         self._validate()
 

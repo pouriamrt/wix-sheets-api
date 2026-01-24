@@ -6,6 +6,7 @@ from fastapi import APIRouter, HTTPException, Query
 
 from config import get_settings
 from services import get_sheets_service
+from schemas.sheet_req import UpdateSheetRequest
 
 router = APIRouter()
 
@@ -53,6 +54,21 @@ def read_sheet(
         result.update(processed)
 
         return result
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/sheet")
+def update_sheet(request: UpdateSheetRequest) -> Dict[str, Any]:
+    """Append the given values to the end of the sheet. Request body: { \"range\": \"...\", \"value\": [[...]] }."""
+    try:
+        settings = get_settings()
+        sheets_service = get_sheets_service()
+        range_ = request.range if request.range is not None else settings.default_range
+        sheets_service.update_sheet(range_, request.value)
+        return {"message": "Sheet updated successfully", "range": range_}
     except HTTPException:
         raise
     except Exception as e:
