@@ -24,8 +24,7 @@ class Settings:
 
     def _validate(self) -> None:
         """Validate that required settings are present."""
-        if not self.google_application_credentials or not self.sheet_id:
-            raise ValueError("GOOGLE_APPLICATION_CREDENTIALS and SHEET_ID must be set")
+        pass
 
 
 # Global settings instance

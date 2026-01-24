@@ -6,6 +6,7 @@ from fastapi import HTTPException
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+import google.auth
 
 from config import get_settings
 
@@ -21,18 +22,20 @@ class SheetsService:
     def _get_service(self):
         """Get or create the Google Sheets service instance."""
         if self._service is None:
-            if not self.settings.google_application_credentials:
-                raise HTTPException(
-                    status_code=500,
-                    detail="GOOGLE_APPLICATION_CREDENTIALS env var is not set",
+            key_path = self.settings.google_application_credentials
+            if key_path:
+                creds = service_account.Credentials.from_service_account_file(
+                    key_path,
+                    scopes=self.settings.scopes,
                 )
-            creds = service_account.Credentials.from_service_account_file(
-                self.settings.google_application_credentials,
-                scopes=self.settings.scopes,
-            )
+            else:
+                # Cloud Run recommended: use the Cloud Run service account (ADC)
+                creds, _project = google.auth.default(scopes=self.settings.scopes)
+
             self._service = build(
                 "sheets", "v4", credentials=creds, cache_discovery=False
             )
+
         return self._service
 
     def read_sheet(
@@ -117,6 +120,8 @@ class SheetsService:
 
     def update_sheet(self, range_: str, value: List[List[Any]]):
         """Append values to the end of the sheet."""
+        if not self.settings.sheet_id:
+            raise HTTPException(status_code=500, detail="SHEET_ID env var is not set")
         try:
             service = self._get_service()
             service.spreadsheets().values().append(

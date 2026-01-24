@@ -1,6 +1,5 @@
 # Wix Backend - FastAPI + Google Sheets API
 # Requires at runtime: GOOGLE_APPLICATION_CREDENTIALS, SHEET_ID
-# Optional: DEFAULT_RANGE (default: Sheet1!A:Z)
 
 FROM python:3.13-slim
 
@@ -17,9 +16,9 @@ RUN uv sync --frozen --no-dev --no-install-project
 COPY . .
 
 # Use the venv where uvicorn and dependencies are installed
-ENV PATH="/app/.venv/bin:$PATH"
+ENV PATH="/app/.venv/bin:$PATH" DEFAULT_RANGE="Sheet1!A:Z" PORT=8080
 
-EXPOSE 8000
+EXPOSE $PORT
 
 # Run as non-root
 RUN groupadd --gid 1000 app && \
@@ -27,4 +26,4 @@ RUN groupadd --gid 1000 app && \
     chown -R app:app /app
 USER app
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "exec uvicorn main:app --host 0.0.0.0 --port ${PORT:-8080}"]
