@@ -1,0 +1,9 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "build"
+      - "-t"
+      - "us-east1-docker.pkg.dev/$PROJECT_ID/wix-proj-repo/wix-nabis-api:latest"
+      - "."
+images:
+  - "us-east1-docker.pkg.dev/$PROJECT_ID/wix-proj-repo/wix-nabis-api:latest"
