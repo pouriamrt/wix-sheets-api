@@ -194,7 +194,7 @@ gcloud run deploy wix-fastapi-nabis \
   --image us-east1-docker.pkg.dev/wix-project-485002/wix-proj-repo/wix-nabis-api:latest \
   --region us-east1 \
   --allow-unauthenticated \
-  --set-env-vars SHEET_ID=YOUR_SHEET_ID,DEFAULT_RANGE="Sheet1!A:Z"
+  --set-env-vars=^,^SHEET_ID=YOUR_SHEET_ID,DEFAULT_RANGE="Sheet1!A:Z"
 ```
 
 - Replace `YOUR_SHEET_ID` with your Google Spreadsheet ID.
