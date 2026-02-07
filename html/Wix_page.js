@@ -1,15 +1,15 @@
 let ALL_ROWS = [];
 let HEADERS = [];
 
-const RELOAD_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
-const SHEET_URL = "https://334431b039ac.ngrok-free.app/sheet";
+const RELOAD_INTERVAL_MS = 2 * 60 * 1000; // 2 minutes
+const SHEET_URL = "https://wix-fastapi-nabis-545041871674.us-east1.run.app/sheet";
 const RANGE_TO_APPEND = "Sheet1!A:J"; // change if your tab is not Sheet1
 
 
 $w.onReady(async function () {
   await refreshDataAndUI();
 
-  // Auto-reload every 5 minutes
+  // Auto-reload every 2 minutes
   setInterval(async () => {
     try {
       await refreshDataAndUI();
