@@ -192,6 +192,25 @@
         width: 100%;
       }
 
+      .welcome {
+        order: 0 !important;
+        padding: 16px 20px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: #f9fafb;
+      }
+      .welcome h1 {
+        margin: 0 0 8px 0;
+        font-size: 22px;
+        color: #111827;
+      }
+      .welcome p {
+        margin: 0;
+        font-size: 15px;
+        line-height: 1.5;
+        color: var(--muted);
+      }
+
       @media (max-width: 980px) {
         .grid3 { grid-template-columns: 1fr; }
       }
@@ -211,6 +230,11 @@
       })();
     </script>
     <div class="wrap">
+      <div class="welcome">
+        <h1>Welcome to the NABIS Directory</h1>
+        <p>This searchable tool connects individuals, families, and professionals with brain injury organizations and support resources. Please explore the organizations listed below using the available filters.</p>
+      </div>
+
       <aside class="sidebar">
         <h2>Filters</h2>
         <div class="controls">
