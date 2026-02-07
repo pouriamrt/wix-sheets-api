@@ -274,6 +274,23 @@
         url: ["Website"]
       };
 
+      // Population Served: show abbreviation + full name (filter and cards)
+      const POPULATION_SERVED_LABELS = {
+        "ABI": "Acquired Brain Injury",
+        "TBI": "Traumatic Brain Injury",
+        "IPV": "Intimate Partner Violence",
+        "BI": "Brain Injury",
+        "ABD": "Acquired Brain Damage",
+        "mTBI": "Mild Traumatic Brain Injury",
+        "MTBI": "Mild Traumatic Brain Injury"
+      };
+      function formatPopulationValue(v) {
+        if (!v || typeof v !== "string") return v;
+        const s = v.trim();
+        const full = POPULATION_SERVED_LABELS[s] || POPULATION_SERVED_LABELS[s.toUpperCase()];
+        return full ? `${s} (${full})` : v;
+      }
+
       // If you have multi-valued cells like "English, French"
       function splitCellValues(v) {
         if (v === null || v === undefined) return [];
@@ -354,7 +371,11 @@
 
         const active = filters
           .filter(f => f.col && f.selected && f.selected.size > 0)
-          .map(f => `${f.col}: ${Array.from(f.selected).slice(0,3).join(", ")}${f.selected.size>3 ? "…" : ""}`);
+          .map(f => {
+            const isPop = (f.col || "").toLowerCase().trim() === "population served";
+            const vals = Array.from(f.selected).slice(0, 3).map(v => isPop ? formatPopulationValue(v) : v);
+            return `${f.col}: ${vals.join(", ")}${f.selected.size > 3 ? "…" : ""}`;
+          });
         document.getElementById("activeFilters").textContent = active.length ? `Active: ${active.join(" | ")}` : "";
 
         renderCards(filtered);
@@ -370,7 +391,8 @@
           const address = pickAddress(r, CARD_MAP.address);
           const services = bulletize(splitCellValues(pick(r, CARD_MAP.services)));
           const cost = bulletize(splitCellValues(pick(r, CARD_MAP.cost)));
-          const funding = bulletize(splitCellValues(pick(r, CARD_MAP.funding)));
+          const fundingRaw = splitCellValues(pick(r, CARD_MAP.funding));
+          const funding = bulletize(fundingRaw.map(formatPopulationValue));
           const logo = pick(r, CARD_MAP.logo);
           const url = pick(r, CARD_MAP.url);
 
@@ -428,7 +450,9 @@
           opt0.textContent = "Choose column…";
           colSelect.appendChild(opt0);
 
+          const excludedFilterCols = ["other", "entity verified", "entry verified", "website"];
           for (const h of headers) {
+            if (excludedFilterCols.includes(h.toLowerCase().trim())) continue;
             const o = document.createElement("option");
             o.value = h;
             o.textContent = h;
@@ -467,6 +491,7 @@
             const q = (f.search || "").trim().toLowerCase();
             const shown = q ? allValues.filter(v => v.toLowerCase().includes(q)) : allValues;
 
+            const isPopulationServed = (f.col || "").toLowerCase().trim() === "population served";
             for (const v of shown) {
               const lab = document.createElement("label");
               const cb = document.createElement("input");
@@ -479,7 +504,7 @@
               });
 
               const span = document.createElement("span");
-              span.textContent = v;
+              span.textContent = isPopulationServed ? formatPopulationValue(v) : v;
               lab.appendChild(cb);
               lab.appendChild(span);
               checklist.appendChild(lab);
@@ -496,10 +521,11 @@
           // Selected chips
           const chips = document.createElement("div");
           chips.className = "chips";
+          const isPopulationServedChip = (f.col || "").toLowerCase().trim() === "population served";
           for (const v of Array.from(f.selected)) {
             const chip = document.createElement("div");
             chip.className = "chip";
-            chip.textContent = `${v} ×`;
+            chip.textContent = `${isPopulationServedChip ? formatPopulationValue(v) : v} ×`;
             chip.addEventListener("click", () => {
               f.selected.delete(v);
               render();
