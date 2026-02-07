@@ -181,6 +181,7 @@
         font-size: 14px;
       }
       .muted { color: var(--muted); font-size: 13px; }
+      .filterBlock select + select { margin-top: 6px; }
       .smallBtn {
         margin-top: 8px;
         border: 1px solid var(--border);
@@ -331,6 +332,13 @@
       function rowMatchesAllFilters(row) {
         for (const f of filters) {
           if (!f.col) continue;
+
+          // Country pre-filter for Region: if a country is selected, the row must match it
+          if (f.col === "Region" && f.parentValue) {
+            const rowCountry = String(row["Country"] || "").trim().toLowerCase();
+            if (rowCountry !== f.parentValue.trim().toLowerCase()) return false;
+          }
+
           if (!f.selected || f.selected.size === 0) continue;
 
           const cell = row[f.col];
@@ -355,13 +363,29 @@
       }
 
       // ---------------- Facet building per column ----------------
-      function uniqueValuesForColumn(col) {
+      function uniqueValuesForColumn(col, parentCol, parentValue) {
         const uniq = new Set();
         for (const r of rows) {
+          if (parentCol && parentValue) {
+            const pCell = String(r[parentCol] || "").trim().toLowerCase();
+            if (pCell !== parentValue.trim().toLowerCase()) continue;
+          }
           const cell = r[col];
           for (const t of splitCellValues(cell)) uniq.add(t);
         }
         return Array.from(uniq).sort((a, b) => a.localeCompare(b, undefined, {numeric:true, sensitivity:"base"}));
+      }
+
+      function buildCountryRegionMap() {
+        const map = {};
+        for (const r of rows) {
+          const country = String(r["Country"] || "").trim();
+          const region = String(r["Region"] || "").trim();
+          if (!country) continue;
+          if (!map[country]) map[country] = new Set();
+          if (region) map[country].add(region);
+        }
+        return map;
       }
 
       // ---------------- UI rendering ----------------
@@ -370,11 +394,14 @@
         document.getElementById("count").textContent = `${filtered.length} results`;
 
         const active = filters
-          .filter(f => f.col && f.selected && f.selected.size > 0)
+          .filter(f => f.col && ((f.selected && f.selected.size > 0) || f.parentValue))
           .map(f => {
             const isPop = (f.col || "").toLowerCase().trim() === "population served";
             const vals = Array.from(f.selected).slice(0, 3).map(v => isPop ? formatPopulationValue(v) : v);
-            return `${f.col}: ${vals.join(", ")}${f.selected.size > 3 ? "…" : ""}`;
+            const parts = [];
+            if (f.parentValue) parts.push(`Country: ${f.parentValue}`);
+            if (vals.length) parts.push(`${f.col}: ${vals.join(", ")}${f.selected.size > 3 ? "…" : ""}`);
+            return parts.join(" > ");
           });
         document.getElementById("activeFilters").textContent = active.length ? `Active: ${active.join(" | ")}` : "";
 
@@ -464,6 +491,7 @@
             f.col = colSelect.value;
             f.selected = new Set();
             f.search = "";
+            f.parentValue = "";
             render(); // rebuild values list
           });
 
@@ -481,13 +509,39 @@
           const checklist = document.createElement("div");
           checklist.className = "checklist";
 
+          // Country pre-filter dropdown for Region
+          let countryDropdown = null;
+          if (f.col === "Region") {
+            const crMap = buildCountryRegionMap();
+            const countries = Object.keys(crMap).sort((a, b) => a.localeCompare(b, undefined, {sensitivity:"base"}));
+            countryDropdown = document.createElement("select");
+            const allOpt = document.createElement("option");
+            allOpt.value = "";
+            allOpt.textContent = "All countries";
+            countryDropdown.appendChild(allOpt);
+            for (const c of countries) {
+              const o = document.createElement("option");
+              o.value = c;
+              o.textContent = c;
+              if (f.parentValue === c) o.selected = true;
+              countryDropdown.appendChild(o);
+            }
+            countryDropdown.addEventListener("change", () => {
+              f.parentValue = countryDropdown.value;
+              f.selected = new Set();
+              render();
+            });
+          }
+
           if (!f.col) {
             const p = document.createElement("div");
             p.className = "muted";
             p.textContent = "Pick a column to see values.";
             checklist.appendChild(p);
           } else {
-            const allValues = uniqueValuesForColumn(f.col);
+            const allValues = f.col === "Region" && f.parentValue
+              ? uniqueValuesForColumn(f.col, "Country", f.parentValue)
+              : uniqueValuesForColumn(f.col);
             const q = (f.search || "").trim().toLowerCase();
             const shown = q ? allValues.filter(v => v.toLowerCase().includes(q)) : allValues;
 
@@ -544,6 +598,7 @@
           });
 
           block.appendChild(colSelect);
+          if (countryDropdown) block.appendChild(countryDropdown);
           block.appendChild(search);
           block.appendChild(checklist);
           if (f.selected.size > 0) block.appendChild(chips);
@@ -553,7 +608,7 @@
       }
 
       function addFilter() {
-        filters.push({ id: `f${nextId++}`, col: "", selected: new Set(), search: "" });
+        filters.push({ id: `f${nextId++}`, col: "", selected: new Set(), search: "", parentValue: "" });
       }
 
       // ---------------- Messaging with Wix ----------------
@@ -591,7 +646,7 @@
       });
 
       document.getElementById("clearAll").addEventListener("click", () => {
-        filters = [{ id: `f${nextId++}`, col: "", selected: new Set(), search: "" }];
+        filters = [{ id: `f${nextId++}`, col: "", selected: new Set(), search: "", parentValue: "" }];
         render();
       });
 
