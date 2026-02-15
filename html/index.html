@@ -1,270 +1,703 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-      /* Force correct order immediately */
-      .wrap > .sidebar { order: 1 !important; }
-      .wrap > .resultsContainer { order: 2 !important; }
-    </style>
-    <style>
+      /* ===== Variables & Reset ===== */
       :root {
-        --border: #e5e7eb;
-        --muted: #6b7280;
-        --bg: #ffffff;
-        --chip: #f3f4f6;
-        --primary: #2563eb;
+        --nabis-blue: #0077C8;
+        --nabis-blue-dark: #005A9C;
+        --nabis-blue-light: #e8f4fd;
+        --nabis-green: #2E9E4B;
+        --nabis-green-light: #edfaf1;
+        --text: #1e293b;
+        --text-muted: #64748b;
+        --bg: #f8fafc;
+        --bg-white: #ffffff;
+        --border: #e2e8f0;
+        --border-light: #f1f5f9;
+        --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+        --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+        --radius: 12px;
+        --radius-sm: 8px;
       }
-      * { box-sizing: border-box; }
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
       body {
-        margin: 0;
-        font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
         background: var(--bg);
-        color: #111827;
+        color: var(--text);
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
       }
 
-      .wrap {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 16px;
-        padding: 16px;
+      /* ===== Header ===== */
+      .site-header {
+        background: var(--bg-white);
+        border-bottom: 2px solid var(--border);
+        padding: 20px 24px;
       }
-
-      /* Results */
-      .resultsHeader {
+      .header-inner {
+        max-width: 1100px;
+        margin: 0 auto;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 10px;
+        flex-wrap: wrap;
+        gap: 16px;
       }
-      .count {
-        color: var(--muted);
-        font-size: 14px;
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
       }
-      .cards {
+      .header-logo {
+        height: 64px;
+        width: auto;
+        object-fit: contain;
+      }
+      /* Fallback text logo when image fails */
+      .logo-fallback {
+        display: none;
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        line-height: 1;
+      }
+      .logo-fallback .blue { color: var(--nabis-blue); }
+      .logo-fallback .green { color: var(--nabis-green); }
+      .logo-fallback .sub {
+        display: block;
+        font-size: 9px;
+        font-weight: 600;
+        color: var(--nabis-blue);
+        letter-spacing: 0.5px;
+        margin-top: 2px;
+      }
+      .brand-text {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 2px;
       }
-      .card {
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 14px;
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 12px;
-      }
-      .card h3 {
-        margin: 0 0 6px 0;
-        font-size: 20px;
+      .brand-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--nabis-blue);
         line-height: 1.2;
       }
-      .meta {
-        color: var(--muted);
-        font-size: 14px;
-        line-height: 1.4;
-        white-space: pre-line;
-      }
-      .grid3 {
-        margin-top: 10px;
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        gap: 8px 12px;
-      }
-      .kv b { display:block; font-size: 13px; margin-bottom: 4px; }
-      .kv .v { color: #111827; font-size: 14px; white-space: pre-line; }
-
-      .logo {
-        width: 110px;
-        height: 70px;
-        object-fit: contain;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        padding: 6px;
-        background: #fff;
-      }
-      .btn {
-        margin-top: 10px;
-        display: inline-block;
-        background: var(--primary);
-        color: #fff;
-        text-decoration: none;
-        padding: 10px 12px;
-        border-radius: 10px;
+      .brand-subtitle {
+        font-size: 13px;
         font-weight: 600;
-        font-size: 14px;
+        color: var(--nabis-green);
+      }
+      .brand-tagline {
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+      .header-nav {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .nav-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 9px 18px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        text-decoration: none;
+        color: var(--text);
+        font-weight: 500;
+        font-size: 13px;
+        background: var(--bg-white);
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+      .nav-btn:hover {
+        background: var(--nabis-blue-light);
+        border-color: var(--nabis-blue);
+        color: var(--nabis-blue);
+      }
+      .nav-btn svg { flex-shrink: 0; }
+
+      /* ===== Main Content ===== */
+      .main-content {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 24px;
       }
 
-      /* Filters */
-      .sidebar {
+      /* ===== Welcome Section ===== */
+      .welcome-section {
+        background: linear-gradient(135deg, var(--nabis-blue-light) 0%, var(--nabis-green-light) 100%);
         border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 12px;
-        position: relative;
-        height: auto;
-        overflow: visible;
-        order: 1 !important;
+        border-radius: var(--radius);
+        padding: 24px 28px;
+        margin-bottom: 24px;
       }
-      
-      /* Results container */
-      .resultsContainer {
-        order: 2 !important;
+      .welcome-section p {
+        font-size: 15px;
+        line-height: 1.6;
+        color: var(--text);
       }
-      .sidebar h2 {
-        margin: 6px 0 10px 0;
-        font-size: 18px;
+
+      /* ===== Filter Panel ===== */
+      .filter-panel {
+        background: var(--bg-white);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        margin-bottom: 24px;
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
       }
-      .controls {
+      .filter-toggle {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 20px;
+        background: var(--bg-white);
+        border: none;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text);
+        transition: background 0.15s;
+      }
+      .filter-toggle:hover { background: var(--border-light); }
+      .filter-toggle svg { color: var(--nabis-blue); flex-shrink: 0; }
+      .filter-toggle .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 22px;
+        height: 22px;
+        padding: 0 6px;
+        background: var(--nabis-blue);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        border-radius: 999px;
+      }
+      .filter-toggle .chevron {
+        margin-left: auto;
+        transition: transform 0.2s ease;
+      }
+      .filter-toggle.collapsed .chevron { transform: rotate(-90deg); }
+
+      .filter-body { padding: 0 20px 20px; }
+      .filter-body.collapsed { display: none; }
+
+      .filter-controls {
         display: flex;
         gap: 8px;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
       }
-      .controls button {
-        border: 1px solid var(--border);
-        background: #fff;
-        padding: 8px 10px;
-        border-radius: 10px;
-        cursor: pointer;
-        font-weight: 600;
-      }
-      .controls button.primary {
-        background: var(--primary);
+      .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 9px 16px;
+        background: var(--nabis-blue);
         color: #fff;
-        border-color: var(--primary);
+        border: 1px solid var(--nabis-blue);
+        border-radius: var(--radius-sm);
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .btn-primary:hover { background: var(--nabis-blue-dark); }
+      .btn-outline {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 9px 16px;
+        background: var(--bg-white);
+        color: var(--text);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .btn-outline:hover { background: var(--border-light); }
+      .filter-hint {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+        line-height: 1.5;
       }
 
       .filterBlock {
         border-top: 1px solid var(--border);
-        padding-top: 10px;
-        margin-top: 10px;
+        padding-top: 14px;
+        margin-top: 14px;
       }
-
-      select, input[type="text"] {
+      .filterBlock select,
+      .filterBlock input[type="text"] {
         width: 100%;
-        padding: 9px 10px;
+        padding: 9px 12px;
         border: 1px solid var(--border);
-        border-radius: 10px;
-        font-size: 14px;
+        border-radius: var(--radius-sm);
+        font-family: inherit;
+        font-size: 13px;
+        color: var(--text);
+        background: var(--bg-white);
+        transition: border-color 0.2s;
       }
-
-      .chips {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin: 8px 0 0 0;
+      .filterBlock select:focus,
+      .filterBlock input[type="text"]:focus {
+        outline: none;
+        border-color: var(--nabis-blue);
+        box-shadow: 0 0 0 3px rgba(0,119,200,0.1);
       }
-      .chip {
-        background: var(--chip);
-        border: 1px solid var(--border);
-        padding: 6px 8px;
-        border-radius: 999px;
-        font-size: 12px;
-        cursor: pointer;
-      }
+      .filterBlock select + select,
+      .filterBlock select + input,
+      .filterBlock input + .checklist { margin-top: 8px; }
 
       .checklist {
         margin-top: 8px;
         display: flex;
         flex-direction: column;
-        gap: 6px;
-        max-height: 220px;
-        overflow: auto;
+        gap: 4px;
+        max-height: 200px;
+        overflow-y: auto;
         border: 1px solid var(--border);
-        border-radius: 10px;
+        border-radius: var(--radius-sm);
         padding: 8px;
+        background: var(--bg);
       }
-      label {
+      .checklist::-webkit-scrollbar { width: 6px; }
+      .checklist::-webkit-scrollbar-track { background: transparent; }
+      .checklist::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+      .checklist label {
         display: flex;
         gap: 8px;
         align-items: center;
-        font-size: 14px;
-      }
-      .muted { color: var(--muted); font-size: 13px; }
-      .filterBlock select + select { margin-top: 6px; }
-      .smallBtn {
-        margin-top: 8px;
-        border: 1px solid var(--border);
-        background: #fff;
-        padding: 8px 10px;
-        border-radius: 10px;
+        font-size: 13px;
+        padding: 4px 6px;
+        border-radius: 6px;
         cursor: pointer;
-        font-weight: 600;
+        transition: background 0.1s;
+      }
+      .checklist label:hover { background: var(--nabis-blue-light); }
+      .checklist input[type="checkbox"] { accent-color: var(--nabis-blue); flex-shrink: 0; }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 10px;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: var(--nabis-blue-light);
+        color: var(--nabis-blue);
+        border: 1px solid #bfdbfe;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .chip:hover { background: #dbeafe; }
+
+      .filter-remove-btn {
+        margin-top: 10px;
         width: 100%;
-      }
-
-      .welcome {
-        order: 0 !important;
-        padding: 16px 20px;
+        padding: 8px 12px;
         border: 1px solid var(--border);
-        border-radius: 12px;
-        background: #f9fafb;
+        border-radius: var(--radius-sm);
+        background: var(--bg-white);
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 500;
+        color: #dc2626;
+        cursor: pointer;
+        transition: all 0.15s;
       }
-      .welcome h1 {
-        margin: 0 0 8px 0;
-        font-size: 22px;
-        color: #111827;
+      .filter-remove-btn:hover { background: #fef2f2; border-color: #fecaca; }
+
+      .muted { color: var(--text-muted); font-size: 13px; padding: 8px 4px; }
+
+      /* ===== Results Section ===== */
+      .results-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 16px;
       }
-      .welcome p {
-        margin: 0;
+      .results-count {
         font-size: 15px;
-        line-height: 1.5;
-        color: var(--muted);
+        font-weight: 600;
+        color: var(--text);
+      }
+      .results-active {
+        font-size: 13px;
+        color: var(--text-muted);
       }
 
-      @media (max-width: 980px) {
-        .grid3 { grid-template-columns: 1fr; }
+      /* ===== Cards ===== */
+      .cards-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .card {
+        background: var(--bg-white);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 24px;
+        box-shadow: var(--shadow-sm);
+        transition: box-shadow 0.2s ease, transform 0.15s ease;
+      }
+      .card:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-1px);
+      }
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 14px;
+      }
+      .card-header-text { flex: 1; min-width: 0; }
+      .card-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.3;
+        margin-bottom: 4px;
+      }
+      .card-location {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 13px;
+        color: var(--text-muted);
+        font-weight: 500;
+      }
+      .card-location svg { color: var(--nabis-blue); flex-shrink: 0; }
+      .card-logo {
+        width: 80px;
+        height: 60px;
+        object-fit: contain;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 6px;
+        background: var(--bg-white);
+        flex-shrink: 0;
+      }
+
+      /* Service tags on cards */
+      .card-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 14px;
+      }
+      .tag {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+      .tag-service {
+        background: var(--nabis-blue-light);
+        color: var(--nabis-blue-dark);
+        border: 1px solid #bfdbfe;
+      }
+
+      /* Detail grid on cards */
+      .card-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 10px 20px;
+        margin-bottom: 16px;
+        padding: 12px 16px;
+        background: var(--bg);
+        border-radius: var(--radius-sm);
+      }
+      .detail-label {
+        display: block;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        margin-bottom: 3px;
+      }
+      .detail-value {
+        display: block;
+        font-size: 13px;
+        color: var(--text);
+        line-height: 1.4;
+      }
+
+      .card-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 20px;
+        background: var(--nabis-blue);
+        color: #fff;
+        border-radius: var(--radius-sm);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 13px;
+        transition: background 0.2s;
+      }
+      .card-btn:hover { background: var(--nabis-blue-dark); }
+      .card-btn svg { flex-shrink: 0; }
+
+      /* ===== Pagination ===== */
+      .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 24px;
+        flex-wrap: wrap;
+      }
+      .pagination:empty { display: none; }
+      .page-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 36px;
+        height: 36px;
+        padding: 0 10px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background: var(--bg-white);
+        color: var(--text);
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s;
+        user-select: none;
+      }
+      .page-btn:hover:not(:disabled):not(.active) {
+        background: var(--nabis-blue-light);
+        border-color: var(--nabis-blue);
+        color: var(--nabis-blue);
+      }
+      .page-btn.active {
+        background: var(--nabis-blue);
+        color: #fff;
+        border-color: var(--nabis-blue);
+        font-weight: 700;
+      }
+      .page-btn:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+      .page-ellipsis {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 36px;
+        color: var(--text-muted);
+        font-size: 14px;
+        user-select: none;
+      }
+      .page-info {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-right: auto;
+      }
+
+      /* ===== Submission Section ===== */
+      .submission-section {
+        background: var(--bg-white);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 24px 28px;
+        margin-top: 32px;
+        box-shadow: var(--shadow-sm);
+      }
+      .submission-section h2 {
+        font-size: 17px;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 10px;
+      }
+      .submission-section p {
+        font-size: 14px;
+        line-height: 1.65;
+        color: var(--text-muted);
+      }
+
+      /* ===== Footer / Disclaimer ===== */
+      .site-footer {
+        max-width: 1100px;
+        margin: 32px auto 0;
+        padding: 0 24px 32px;
+      }
+      .disclaimer {
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+        border-radius: var(--radius);
+        padding: 20px 24px;
+      }
+      .disclaimer p {
+        font-size: 12px;
+        color: #92400e;
+        line-height: 1.65;
+      }
+      .disclaimer strong {
+        font-weight: 700;
+      }
+
+      /* ===== Responsive ===== */
+      @media (max-width: 768px) {
+        .header-inner { flex-direction: column; align-items: flex-start; }
+        .brand { flex-direction: column; align-items: flex-start; gap: 10px; }
+        .header-logo { height: 48px; }
+        .brand-title { font-size: 20px; }
+        .header-nav { width: 100%; }
+        .nav-btn { flex: 1; justify-content: center; padding: 10px 12px; }
+        .main-content { padding: 16px; }
+        .welcome-section { padding: 18px 20px; }
+        .card { padding: 18px; }
+        .card-details { grid-template-columns: 1fr; }
+        .card-header { flex-direction: column-reverse; }
+        .card-logo { width: 60px; height: 45px; }
+      }
+      @media (max-width: 480px) {
+        .filter-controls { flex-direction: column; }
+        .btn-primary, .btn-outline { width: 100%; justify-content: center; }
       }
     </style>
   </head>
   <body>
-    <script>
-      // Immediately enforce correct order
-      (function() {
-        const style = document.createElement('style');
-        style.textContent = `
-          .wrap { display: flex !important; flex-direction: column !important; }
-          .wrap > .sidebar { order: 1 !important; }
-          .wrap > .resultsContainer { order: 2 !important; }
-        `;
-        document.head.appendChild(style);
-      })();
-    </script>
-    <div class="wrap">
-      <div class="welcome">
-        <h1>Welcome to the NABIS Directory</h1>
-        <p>This searchable tool connects individuals, families, and professionals with brain injury organizations and support resources. Please explore the organizations listed below using the available filters.</p>
+
+    <!-- ===== Header ===== -->
+    <header class="site-header">
+      <div class="header-inner">
+        <div class="brand">
+          <div>
+            <!--
+              LOGO: Replace the src below with the hosted NABIS logo URL.
+              Upload the logo to Wix Media Manager and paste the URL here.
+              The fallback text logo will show if the image fails to load.
+            -->
+            <img
+              class="header-logo"
+              src="https://static.wixstatic.com/media/nabis-logo-placeholder.png"
+              alt="NABIS Logo"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+            >
+            <div class="logo-fallback" aria-hidden="true">
+              <span class="blue">na</span><span class="green">bi</span><span class="blue">s</span>
+              <span class="sub">north american brain injury society</span>
+            </div>
+          </div>
+          <div class="brand-text">
+            <h1 class="brand-title">NABIS Navigator</h1>
+            <p class="brand-subtitle">North American Brain Injury Society</p>
+            <p class="brand-tagline">A centralized resource connecting brain injury associations.</p>
+          </div>
+        </div>
+        <nav class="header-nav">
+          <a class="nav-btn" href="https://transcendentconcussion.ca/nabis/glossary" target="_blank" rel="noopener">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            Glossary
+          </a>
+          <a class="nav-btn" href="https://transcendentconcussion.ca/nabis/about" target="_blank" rel="noopener">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            About
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- ===== Main Content ===== -->
+    <main class="main-content">
+
+      <!-- Welcome -->
+      <section class="welcome-section">
+        <p>This searchable tool connects individuals, families, and professionals with brain injury organizations and support resources across North America. Please explore the organizations listed below using the available filters.</p>
+      </section>
+
+      <!-- Filter Panel -->
+      <div class="filter-panel">
+        <button class="filter-toggle" id="filterToggle" type="button">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          Filters
+          <span class="badge" id="filterCount">0</span>
+          <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="filter-body" id="filterBody">
+          <div class="filter-controls">
+            <button class="btn-primary" id="addFilter" type="button">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Filter
+            </button>
+            <button class="btn-outline" id="clearAll" type="button">Clear All</button>
+          </div>
+          <p class="filter-hint">Add multiple filters to narrow your search. Results must match all filters, and any selected value within a filter will be included.</p>
+          <div id="filters"></div>
+        </div>
       </div>
 
-      <aside class="sidebar">
-        <h2>Filters</h2>
-        <div class="controls">
-          <button class="primary" id="addFilter">Add Filter</button>
-          <button id="clearAll">Clear</button>
+      <!-- Results -->
+      <div class="results-section">
+        <div class="results-header">
+          <div class="results-count" id="count">Waiting for data&hellip;</div>
+          <div class="results-active" id="activeFilters"></div>
         </div>
-        <div class="muted">Add multiple filters to narrow your search. Results must match all filters, and any selected value within a filter will be included.</div>
-        <div id="filters"></div>
-      </aside>
-
-      <div class="resultsContainer">
-        <div class="resultsHeader">
-          <div class="count" id="count">Waiting for data…</div>
-          <div class="count" id="activeFilters"></div>
-        </div>
-        <div class="cards" id="cards"></div>
+        <div class="cards-list" id="cards"></div>
+        <div class="pagination" id="pagination"></div>
       </div>
-    </div>
 
+      <!-- Submission Statement -->
+      <section class="submission-section">
+        <h2>Submit Your Organization</h2>
+        <p>If you would like your organization or society to be considered for inclusion in the searchable NABIS Navigator database, please complete the form below. All submissions will be reviewed. Only organizations that meet our established terms and eligibility criteria will be listed.</p>
+      </section>
+
+    </main>
+
+    <!-- ===== Footer / Disclaimer ===== -->
+    <footer class="site-footer">
+      <div class="disclaimer">
+        <p><strong>Disclaimer:</strong> The North American Brain Injury Society (NABIS) does not endorse these organizations or vendors, nor does it make any representations or warranties, express or implied, concerning the quality of any services or the accuracy of the information they may provide. In addition, NABIS does not take responsibility for any services provided by third parties.</p>
+      </div>
+    </footer>
+
+    <!-- ===== JavaScript ===== -->
     <script>
-      // ---------------- State ----------------
+      // ==================== State ====================
       let rows = [];
       let headers = [];
-      let filters = []; // [{id, col, selected:Set, search:""}]
+      let filters = []; // [{id, col, selected:Set, search:"", parentValue:""}]
       let nextId = 1;
+      let currentPage = 1;
+      const PER_PAGE = 12;
 
-      // Map your real sheet headers to card fields:
-      // If your headers differ, change these keys.
-      // This can be overridden by Wix via SET_CARD_MAP message
+      // Map sheet headers to card fields.
+      // Can be overridden by Wix via SET_CARD_MAP message.
       const CARD_MAP = {
         title: ["Organization Name"],
         address: ["Region", "Country"],
@@ -275,7 +708,7 @@
         url: ["Website"]
       };
 
-      // Population Served: show abbreviation + full name (filter and cards)
+      // Population Served: show abbreviation + full name
       const POPULATION_SERVED_LABELS = {
         "ABI": "Acquired Brain Injury",
         "TBI": "Traumatic Brain Injury",
@@ -292,7 +725,7 @@
         return full ? `${s} (${full})` : v;
       }
 
-      // If you have multi-valued cells like "English, French"
+      // Split multi-valued cells like "English, French"
       function splitCellValues(v) {
         if (v === null || v === undefined) return [];
         const s = String(v).trim();
@@ -312,7 +745,6 @@
         return k ? row[k] : "";
       }
 
-      // Combine multiple address fields (e.g., Region + Country)
       function pickAddress(row, candidates) {
         const parts = [];
         for (const k of candidates) {
@@ -323,17 +755,12 @@
         return parts.join(", ");
       }
 
-      function bulletize(arr) {
-        if (!arr || arr.length === 0) return "";
-        return arr.map(x => `• ${x}`).join("\n");
-      }
-
-      // ---------------- Filtering logic ----------------
+      // ==================== Filtering Logic ====================
       function rowMatchesAllFilters(row) {
         for (const f of filters) {
           if (!f.col) continue;
 
-          // Country pre-filter for Region: if a country is selected, the row must match it
+          // Country pre-filter for Region
           if (f.col === "Region" && f.parentValue) {
             const rowCountry = String(row["Country"] || "").trim().toLowerCase();
             if (rowCountry !== f.parentValue.trim().toLowerCase()) return false;
@@ -344,7 +771,6 @@
           const cell = row[f.col];
           if (cell === null || cell === undefined) return false;
 
-          // token match OR whole-cell match (case-insensitive)
           const tokens = splitCellValues(cell).map(x => x.toLowerCase());
           const full = String(cell).toLowerCase();
 
@@ -362,7 +788,7 @@
         return rows.filter(rowMatchesAllFilters);
       }
 
-      // ---------------- Facet building per column ----------------
+      // ==================== Facet Building ====================
       function uniqueValuesForColumn(col, parentCol, parentValue) {
         const uniq = new Set();
         for (const r of rows) {
@@ -373,7 +799,7 @@
           const cell = r[col];
           for (const t of splitCellValues(cell)) uniq.add(t);
         }
-        return Array.from(uniq).sort((a, b) => a.localeCompare(b, undefined, {numeric:true, sensitivity:"base"}));
+        return Array.from(uniq).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
       }
 
       function buildCountryRegionMap() {
@@ -388,11 +814,31 @@
         return map;
       }
 
-      // ---------------- UI rendering ----------------
+      // ==================== UI Rendering ====================
       function render() {
         const filtered = getFilteredRows();
-        document.getElementById("count").textContent = `${filtered.length} results`;
+        const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
 
+        // Clamp current page
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+
+        const start = (currentPage - 1) * PER_PAGE;
+        const end = Math.min(start + PER_PAGE, filtered.length);
+        const pageItems = filtered.slice(start, end);
+
+        // "Showing 1–12 of 45 results"
+        if (filtered.length === 0) {
+          document.getElementById("count").textContent = "0 results";
+        } else {
+          document.getElementById("count").textContent = `Showing ${start + 1}\u2013${end} of ${filtered.length} result${filtered.length !== 1 ? "s" : ""}`;
+        }
+
+        // Active filter count badge
+        const activeCount = filters.filter(f => f.col && f.selected && f.selected.size > 0).length;
+        document.getElementById("filterCount").textContent = activeCount;
+
+        // Active filter summary
         const active = filters
           .filter(f => f.col && ((f.selected && f.selected.size > 0) || f.parentValue))
           .map(f => {
@@ -400,12 +846,13 @@
             const vals = Array.from(f.selected).slice(0, 3).map(v => isPop ? formatPopulationValue(v) : v);
             const parts = [];
             if (f.parentValue) parts.push(`Country: ${f.parentValue}`);
-            if (vals.length) parts.push(`${f.col}: ${vals.join(", ")}${f.selected.size > 3 ? "…" : ""}`);
-            return parts.join(" > ");
+            if (vals.length) parts.push(`${f.col}: ${vals.join(", ")}${f.selected.size > 3 ? "\u2026" : ""}`);
+            return parts.join(" \u203A ");
           });
         document.getElementById("activeFilters").textContent = active.length ? `Active: ${active.join(" | ")}` : "";
 
-        renderCards(filtered);
+        renderCards(pageItems);
+        renderPagination(filtered.length, totalPages);
         renderFilters();
       }
 
@@ -413,53 +860,135 @@
         const el = document.getElementById("cards");
         el.innerHTML = "";
 
+        if (list.length === 0) {
+          el.innerHTML = `<div style="text-align:center; padding:40px 20px; color:var(--text-muted);">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 12px; display:block; opacity:0.4;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <p style="font-size:15px; font-weight:600; margin-bottom:4px;">No organizations found</p>
+            <p style="font-size:13px;">Try adjusting your filters to see more results.</p>
+          </div>`;
+          return;
+        }
+
         for (const r of list) {
           const title = pick(r, CARD_MAP.title) || "(No name)";
           const address = pickAddress(r, CARD_MAP.address);
-          const services = bulletize(splitCellValues(pick(r, CARD_MAP.services)));
-          const cost = bulletize(splitCellValues(pick(r, CARD_MAP.cost)));
-          const fundingRaw = splitCellValues(pick(r, CARD_MAP.funding));
-          const funding = bulletize(fundingRaw.map(formatPopulationValue));
+          const servicesArr = splitCellValues(pick(r, CARD_MAP.services));
+          const scopeArr = splitCellValues(pick(r, CARD_MAP.cost || []));
           const logo = pick(r, CARD_MAP.logo);
           const url = pick(r, CARD_MAP.url);
+
+          // Access Type and Population Served separately for richer card display
+          const typeArr = splitCellValues(r["Type"] || "");
+          const popArr = splitCellValues(r["Population Served"] || "").map(formatPopulationValue);
 
           const card = document.createElement("div");
           card.className = "card";
 
-          const left = document.createElement("div");
-          left.innerHTML = `
-            <h3>${escapeHtml(String(title))}</h3>
-            <div class="meta">${escapeHtml(String(address || ""))}</div>
-            <div class="grid3">
-              <div class="kv">
-                <b>Services</b>
-                <div class="v">${escapeHtml(services)}</div>
-              </div>
-              <div class="kv">
-                <b>Cost</b>
-                <div class="v">${escapeHtml(cost)}</div>
-              </div>
-              <div class="kv">
-                <b>Funding Type</b>
-                <div class="v">${escapeHtml(funding)}</div>
-              </div>
-            </div>
-            ${url ? `<a class="btn" href="${escapeAttr(url)}" target="_blank" rel="noopener">See More</a>` : ""}
-          `;
+          let html = "";
 
-          const right = document.createElement("div");
-          if (logo) {
-            const img = document.createElement("img");
-            img.className = "logo";
-            img.src = logo;
-            img.alt = "logo";
-            right.appendChild(img);
+          // Card header: title, location, optional logo
+          html += `<div class="card-header">
+            <div class="card-header-text">
+              <h3 class="card-title">${esc(title)}</h3>
+              ${address ? `<p class="card-location">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                ${esc(address)}
+              </p>` : ""}
+            </div>
+            ${logo ? `<img src="${escAttr(logo)}" alt="${escAttr(title)}" class="card-logo">` : ""}
+          </div>`;
+
+          // Service tags
+          if (servicesArr.length > 0) {
+            html += `<div class="card-tags">
+              ${servicesArr.map(s => `<span class="tag tag-service">${esc(s)}</span>`).join("")}
+            </div>`;
           }
 
-          card.appendChild(left);
-          card.appendChild(right);
+          // Detail grid
+          const details = [];
+          if (scopeArr.length > 0) {
+            details.push(`<div class="detail-item"><span class="detail-label">Scope</span><span class="detail-value">${esc(scopeArr.join(", "))}</span></div>`);
+          }
+          if (typeArr.length > 0) {
+            details.push(`<div class="detail-item"><span class="detail-label">Type</span><span class="detail-value">${esc(typeArr.join(", "))}</span></div>`);
+          }
+          if (popArr.length > 0) {
+            details.push(`<div class="detail-item"><span class="detail-label">Population Served</span><span class="detail-value">${esc(popArr.join(", "))}</span></div>`);
+          }
+          if (details.length > 0) {
+            html += `<div class="card-details">${details.join("")}</div>`;
+          }
+
+          // Visit Website button
+          if (url) {
+            html += `<a class="card-btn" href="${escAttr(url)}" target="_blank" rel="noopener">
+              Visit Website
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>`;
+          }
+
+          card.innerHTML = html;
           el.appendChild(card);
         }
+      }
+
+      function renderPagination(total, totalPages) {
+        const el = document.getElementById("pagination");
+        el.innerHTML = "";
+        if (totalPages <= 1) return;
+
+        // Prev button
+        const prev = document.createElement("button");
+        prev.className = "page-btn";
+        prev.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>`;
+        prev.disabled = currentPage === 1;
+        prev.addEventListener("click", () => { currentPage--; render(); scrollToResults(); });
+        el.appendChild(prev);
+
+        // Page numbers with ellipsis for large page counts
+        const pages = buildPageNumbers(currentPage, totalPages);
+        for (const p of pages) {
+          if (p === "...") {
+            const dots = document.createElement("span");
+            dots.className = "page-ellipsis";
+            dots.textContent = "\u2026";
+            el.appendChild(dots);
+          } else {
+            const btn = document.createElement("button");
+            btn.className = "page-btn" + (p === currentPage ? " active" : "");
+            btn.textContent = p;
+            btn.addEventListener("click", () => { currentPage = p; render(); scrollToResults(); });
+            el.appendChild(btn);
+          }
+        }
+
+        // Next button
+        const next = document.createElement("button");
+        next.className = "page-btn";
+        next.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
+        next.disabled = currentPage === totalPages;
+        next.addEventListener("click", () => { currentPage++; render(); scrollToResults(); });
+        el.appendChild(next);
+      }
+
+      // Build a compact page number array like [1, "...", 4, 5, 6, "...", 10]
+      function buildPageNumbers(current, total) {
+        if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+        const pages = [];
+        pages.push(1);
+        if (current > 3) pages.push("...");
+        for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
+          pages.push(i);
+        }
+        if (current < total - 2) pages.push("...");
+        pages.push(total);
+        return pages;
+      }
+
+      function scrollToResults() {
+        const el = document.getElementById("count");
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
       }
 
       function renderFilters() {
@@ -474,7 +1003,7 @@
           const colSelect = document.createElement("select");
           const opt0 = document.createElement("option");
           opt0.value = "";
-          opt0.textContent = "Choose column…";
+          opt0.textContent = "Choose column\u2026";
           colSelect.appendChild(opt0);
 
           const excludedFilterCols = ["other", "entity verified", "entry verified", "website"];
@@ -492,28 +1021,29 @@
             f.selected = new Set();
             f.search = "";
             f.parentValue = "";
-            render(); // rebuild values list
+            currentPage = 1;
+            render();
           });
 
-          // Search box for values
+          // Search box
           const search = document.createElement("input");
           search.type = "text";
-          search.placeholder = "Search values…";
+          search.placeholder = "Search values\u2026";
           search.value = f.search || "";
           search.addEventListener("input", () => {
             f.search = search.value;
-            renderFilters(); // update only filter list
+            renderFilters();
           });
 
           // Values checklist
           const checklist = document.createElement("div");
           checklist.className = "checklist";
 
-          // Country pre-filter dropdown for Region
+          // Country pre-filter for Region
           let countryDropdown = null;
           if (f.col === "Region") {
             const crMap = buildCountryRegionMap();
-            const countries = Object.keys(crMap).sort((a, b) => a.localeCompare(b, undefined, {sensitivity:"base"}));
+            const countries = Object.keys(crMap).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
             countryDropdown = document.createElement("select");
             const allOpt = document.createElement("option");
             allOpt.value = "";
@@ -529,6 +1059,7 @@
             countryDropdown.addEventListener("change", () => {
               f.parentValue = countryDropdown.value;
               f.selected = new Set();
+              currentPage = 1;
               render();
             });
           }
@@ -554,12 +1085,13 @@
               cb.addEventListener("change", () => {
                 if (cb.checked) f.selected.add(v);
                 else f.selected.delete(v);
+                currentPage = 1;
                 render();
               });
 
               const span = document.createElement("span");
               span.textContent = isPopulationServed ? formatPopulationValue(v) : v;
-              lab.appendChild(cb); 
+              lab.appendChild(cb);
               lab.appendChild(span);
               checklist.appendChild(lab);
             }
@@ -575,13 +1107,14 @@
           // Selected chips
           const chips = document.createElement("div");
           chips.className = "chips";
-          const isPopulationServedChip = (f.col || "").toLowerCase().trim() === "population served";
+          const isPopChip = (f.col || "").toLowerCase().trim() === "population served";
           for (const v of Array.from(f.selected)) {
             const chip = document.createElement("div");
             chip.className = "chip";
-            chip.textContent = `${isPopulationServedChip ? formatPopulationValue(v) : v} ×`;
+            chip.textContent = `${isPopChip ? formatPopulationValue(v) : v} \u00D7`;
             chip.addEventListener("click", () => {
               f.selected.delete(v);
+              currentPage = 1;
               render();
             });
             chips.appendChild(chip);
@@ -589,7 +1122,8 @@
 
           // Remove filter button
           const removeBtn = document.createElement("button");
-          removeBtn.className = "smallBtn";
+          removeBtn.className = "filter-remove-btn";
+          removeBtn.type = "button";
           removeBtn.textContent = "Remove this filter";
           removeBtn.addEventListener("click", () => {
             filters = filters.filter(x => x.id !== f.id);
@@ -611,7 +1145,7 @@
         filters.push({ id: `f${nextId++}`, col: "", selected: new Set(), search: "", parentValue: "" });
       }
 
-      // ---------------- Messaging with Wix ----------------
+      // ==================== Wix Messaging ====================
       window.onmessage = (event) => {
         const msg = event.data;
         if (!msg || typeof msg !== "object") return;
@@ -619,18 +1153,17 @@
         if (msg.type === "INIT_DATA") {
           rows = Array.isArray(msg.rows) ? msg.rows : [];
           headers = Array.isArray(msg.headers) ? msg.headers : Object.keys(rows[0] || {});
+          currentPage = 1;
           if (filters.length === 0) addFilter();
           render();
         }
 
         if (msg.type === "SET_CARD_MAP") {
-          // optional: allow Velo to override mapping
           Object.assign(CARD_MAP, msg.map || {});
           render();
         }
       };
 
-      // Send events to Wix (optional)
       function notifyWixFilters() {
         const payload = filters.map(f => ({
           col: f.col,
@@ -639,24 +1172,36 @@
         parent.postMessage({ type: "FILTERS_CHANGED", filters: payload }, "*");
       }
 
-      // Hook top buttons
+      // ==================== Event Handlers ====================
+
+      // Filter toggle (expand/collapse)
+      document.getElementById("filterToggle").addEventListener("click", () => {
+        const body = document.getElementById("filterBody");
+        const toggle = document.getElementById("filterToggle");
+        body.classList.toggle("collapsed");
+        toggle.classList.toggle("collapsed");
+      });
+
+      // Add filter
       document.getElementById("addFilter").addEventListener("click", () => {
         addFilter();
         render();
       });
 
+      // Clear all filters
       document.getElementById("clearAll").addEventListener("click", () => {
         filters = [{ id: `f${nextId++}`, col: "", selected: new Set(), search: "", parentValue: "" }];
+        currentPage = 1;
         render();
       });
 
-      // Basic escaping
-      function escapeHtml(s) {
+      // ==================== Utilities ====================
+      function esc(s) {
         return String(s || "").replace(/[&<>"']/g, (c) => ({
           "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
         }[c]));
       }
-      function escapeAttr(s) {
+      function escAttr(s) {
         return String(s || "").replace(/"/g, "%22");
       }
     </script>
