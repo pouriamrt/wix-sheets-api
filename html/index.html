@@ -569,6 +569,24 @@
         font-weight: 700;
       }
 
+      /* ===== Resilience — prevent overflow at any width ===== */
+      body { overflow-x: hidden; }
+      .header-inner,
+      .main-content,
+      .site-footer { width: 100%; }
+      .card-title,
+      .detail-value,
+      .card-location,
+      .welcome-section p,
+      .submission-section p,
+      .disclaimer p,
+      .filter-hint { overflow-wrap: anywhere; word-break: break-word; }
+      .card-header-text,
+      .brand-text { min-width: 0; }
+      img { max-width: 100%; height: auto; }
+      .header-logo { max-width: 100%; }
+      .tag { white-space: normal; }
+
       /* ===== Responsive ===== */
       @media (max-width: 768px) {
         .header-inner { flex-direction: column; align-items: flex-start; }
@@ -587,6 +605,11 @@
       @media (max-width: 480px) {
         .filter-controls { flex-direction: column; }
         .btn-primary, .btn-outline { width: 100%; justify-content: center; }
+        .site-header { padding: 14px 12px; }
+        .main-content { padding: 12px; }
+        .card { padding: 14px; }
+        .welcome-section { padding: 14px 16px; }
+        .card-btn { width: 100%; justify-content: center; }
       }
     </style>
   </head>
@@ -604,7 +627,7 @@
             -->
             <img
               class="header-logo"
-              src="https://static.wixstatic.com/media/nabis-logo-placeholder.png"
+              src="https://static.wixstatic.com/media/38bed8_20c6bec421bb4d59b602110bb831c42b~mv2.jpg"
               alt="NABIS Logo"
               onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
             >
