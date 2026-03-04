@@ -1026,7 +1026,7 @@
           const colSelect = document.createElement("select");
           const opt0 = document.createElement("option");
           opt0.value = "";
-          opt0.textContent = "Choose column\u2026";
+          opt0.textContent = "Filter by\u2026";
           colSelect.appendChild(opt0);
 
           const excludedFilterCols = ["other", "entity verified", "entry verified", "website"];
@@ -1052,10 +1052,22 @@
           const search = document.createElement("input");
           search.type = "text";
           search.placeholder = "Search values\u2026";
+          search.dataset.filterId = f.id;
           search.value = f.search || "";
+          let _debounceTimer;
           search.addEventListener("input", () => {
-            f.search = search.value;
-            renderFilters();
+            clearTimeout(_debounceTimer);
+            _debounceTimer = setTimeout(() => {
+              const cursorPos = search.selectionStart;
+              f.search = search.value;
+              renderFilters();
+              // Restore focus to the rebuilt search input
+              const rebuilt = document.querySelector(`input[data-filter-id="${f.id}"]`);
+              if (rebuilt) {
+                rebuilt.focus();
+                rebuilt.setSelectionRange(cursorPos, cursorPos);
+              }
+            }, 300);
           });
 
           // Values checklist
@@ -1090,7 +1102,7 @@
           if (!f.col) {
             const p = document.createElement("div");
             p.className = "muted";
-            p.textContent = "Pick a column to see values.";
+            p.textContent = "Select a field to see values.";
             checklist.appendChild(p);
           } else {
             const allValues = f.col === "Region" && f.parentValue
