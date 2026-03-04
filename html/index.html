@@ -196,24 +196,9 @@
       .filter-controls {
         display: flex;
         gap: 8px;
-        margin-bottom: 12px;
-      }
-      .btn-primary {
-        display: inline-flex;
+        margin-bottom: 16px;
         align-items: center;
-        gap: 6px;
-        padding: 9px 16px;
-        background: var(--nabis-blue);
-        color: #fff;
-        border: 1px solid var(--nabis-blue);
-        border-radius: var(--radius-sm);
-        font-family: inherit;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.2s;
       }
-      .btn-primary:hover { background: var(--nabis-blue-dark); }
       .btn-outline {
         display: inline-flex;
         align-items: center;
@@ -233,17 +218,26 @@
       .filter-hint {
         font-size: 13px;
         color: var(--text-muted);
-        margin-bottom: 6px;
+        margin-bottom: 16px;
         line-height: 1.5;
       }
 
-      .filterBlock {
-        border-top: 1px solid var(--border);
-        padding-top: 14px;
-        margin-top: 14px;
+      /* Dropdowns row */
+      .filter-dropdowns {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-bottom: 20px;
       }
-      .filterBlock select,
-      .filterBlock input[type="text"] {
+      .filter-dropdown-group label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 6px;
+      }
+      .filter-dropdown-group select,
+      .filter-dropdown-group input[type="text"] {
         width: 100%;
         padding: 9px 12px;
         border: 1px solid var(--border);
@@ -254,32 +248,33 @@
         background: var(--bg-white);
         transition: border-color 0.2s;
       }
-      .filterBlock select:focus,
-      .filterBlock input[type="text"]:focus {
+      .filter-dropdown-group select:focus,
+      .filter-dropdown-group input[type="text"]:focus {
         outline: none;
         border-color: var(--nabis-blue);
         box-shadow: 0 0 0 3px rgba(0,119,200,0.1);
       }
-      .filterBlock select + select,
-      .filterBlock select + input,
-      .filterBlock input + .checklist { margin-top: 8px; }
+
+      /* Checkbox grid */
+      .filter-checkbox-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        border-top: 1px solid var(--border);
+        padding-top: 20px;
+      }
+      .filter-section-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 10px;
+      }
 
       .checklist {
-        margin-top: 8px;
         display: flex;
         flex-direction: column;
         gap: 4px;
-        max-height: 200px;
-        overflow-y: auto;
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
-        padding: 8px;
-        background: var(--bg);
       }
-      .checklist::-webkit-scrollbar { width: 6px; }
-      .checklist::-webkit-scrollbar-track { background: transparent; }
-      .checklist::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
       .checklist label {
         display: flex;
         gap: 8px;
@@ -292,44 +287,6 @@
       }
       .checklist label:hover { background: var(--nabis-blue-light); }
       .checklist input[type="checkbox"] { accent-color: var(--nabis-blue); flex-shrink: 0; }
-
-      .chips {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-top: 10px;
-      }
-      .chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        background: var(--nabis-blue-light);
-        color: var(--nabis-blue);
-        border: 1px solid #bfdbfe;
-        padding: 4px 10px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.15s;
-      }
-      .chip:hover { background: #dbeafe; }
-
-      .filter-remove-btn {
-        margin-top: 10px;
-        width: 100%;
-        padding: 8px 12px;
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
-        background: var(--bg-white);
-        font-family: inherit;
-        font-size: 12px;
-        font-weight: 500;
-        color: #dc2626;
-        cursor: pointer;
-        transition: all 0.15s;
-      }
-      .filter-remove-btn:hover { background: #fef2f2; border-color: #fecaca; }
 
       .muted { color: var(--text-muted); font-size: 13px; padding: 8px 4px; }
 
@@ -601,10 +558,12 @@
         .card-details { grid-template-columns: 1fr; }
         .card-header { flex-direction: column-reverse; }
         .card-logo { width: 60px; height: 45px; }
+        .filter-dropdowns { grid-template-columns: 1fr; }
+        .filter-checkbox-grid { grid-template-columns: 1fr; }
       }
       @media (max-width: 480px) {
         .filter-controls { flex-direction: column; }
-        .btn-primary, .btn-outline { width: 100%; justify-content: center; }
+        .btn-outline { width: 100%; justify-content: center; }
         .site-header { padding: 14px 12px; }
         .main-content { padding: 12px; }
         .card { padding: 14px; }
@@ -677,13 +636,9 @@
         </button>
         <div class="filter-body" id="filterBody">
           <div class="filter-controls">
-            <button class="btn-primary" id="addFilter" type="button">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Add Filter
-            </button>
             <button class="btn-outline" id="clearAll" type="button">Clear All</button>
           </div>
-          <p class="filter-hint">Add multiple filters to narrow your search. Results must match all filters, and any selected value within a filter will be included.</p>
+          <p class="filter-hint">Use the filters below to narrow your search. Results must match all selected filters.</p>
           <div id="filters"></div>
         </div>
       </div>
@@ -718,8 +673,15 @@
       // ==================== State ====================
       let rows = [];
       let headers = [];
-      let filters = []; // [{id, col, selected:Set, search:"", parentValue:""}]
-      let nextId = 1;
+      // Static filter state — one entry per filterable column
+      const staticFilters = {
+        "Country": "",
+        "Scope": "",
+        "Region": "",
+        "Type": new Set(),
+        "Population Served": new Set(),
+        "Services / Resources": new Set()
+      };
       let currentPage = 1;
       const PER_PAGE = 5;
 
@@ -784,25 +746,30 @@
 
       // ==================== Filtering Logic ====================
       function rowMatchesAllFilters(row) {
-        for (const f of filters) {
-          if (!f.col) continue;
-
-          // Country pre-filter for Region
-          if (f.col === "Region" && f.parentValue) {
-            const rowCountry = String(row["Country"] || "").trim().toLowerCase();
-            if (rowCountry !== f.parentValue.trim().toLowerCase()) return false;
-          }
-
-          if (!f.selected || f.selected.size === 0) continue;
-
-          const cell = row[f.col];
+        // Dropdown filters — exact match
+        if (staticFilters["Country"]) {
+          const cell = String(row["Country"] || "").trim().toLowerCase();
+          if (cell !== staticFilters["Country"].toLowerCase()) return false;
+        }
+        if (staticFilters["Scope"]) {
+          const cell = String(row["Scope"] || "").trim().toLowerCase();
+          if (cell !== staticFilters["Scope"].toLowerCase()) return false;
+        }
+        // Region — substring match
+        if (staticFilters["Region"]) {
+          const cell = String(row["Region"] || "").toLowerCase();
+          if (!cell.includes(staticFilters["Region"].toLowerCase())) return false;
+        }
+        // Checkbox filters — at least one selected value must match
+        for (const col of ["Type", "Population Served", "Services / Resources"]) {
+          const selected = staticFilters[col];
+          if (!selected || selected.size === 0) continue;
+          const cell = row[col];
           if (cell === null || cell === undefined) return false;
-
           const tokens = splitCellValues(cell).map(x => x.toLowerCase());
           const full = String(cell).toLowerCase();
-
           let ok = false;
-          for (const sel of f.selected) {
+          for (const sel of selected) {
             const q = String(sel).toLowerCase();
             if (tokens.includes(q) || full === q) { ok = true; break; }
           }
@@ -862,20 +829,27 @@
         }
 
         // Active filter count badge
-        const activeCount = filters.filter(f => f.col && f.selected && f.selected.size > 0).length;
+        let activeCount = 0;
+        if (staticFilters["Country"]) activeCount++;
+        if (staticFilters["Scope"]) activeCount++;
+        if (staticFilters["Region"]) activeCount++;
+        for (const col of ["Type", "Population Served", "Services / Resources"]) {
+          if (staticFilters[col].size > 0) activeCount++;
+        }
         document.getElementById("filterCount").textContent = activeCount;
 
         // Active filter summary
-        const active = filters
-          .filter(f => f.col && ((f.selected && f.selected.size > 0) || f.parentValue))
-          .map(f => {
-            const isPop = (f.col || "").toLowerCase().trim() === "population served";
-            const vals = Array.from(f.selected).slice(0, 3).map(v => isPop ? formatPopulationValue(v) : v);
-            const parts = [];
-            if (f.parentValue) parts.push(`Country: ${f.parentValue}`);
-            if (vals.length) parts.push(`${f.col}: ${vals.join(", ")}${f.selected.size > 3 ? "\u2026" : ""}`);
-            return parts.join(" \u203A ");
-          });
+        const active = [];
+        if (staticFilters["Country"]) active.push(`Country: ${staticFilters["Country"]}`);
+        if (staticFilters["Scope"]) active.push(`Scope: ${staticFilters["Scope"]}`);
+        if (staticFilters["Region"]) active.push(`Region: ${staticFilters["Region"]}`);
+        for (const col of ["Type", "Population Served", "Services / Resources"]) {
+          if (staticFilters[col].size > 0) {
+            const isPop = col === "Population Served";
+            const vals = Array.from(staticFilters[col]).slice(0, 3).map(v => isPop ? formatPopulationValue(v) : v);
+            active.push(`${col}: ${vals.join(", ")}${staticFilters[col].size > 3 ? "\u2026" : ""}`);
+          }
+        }
         document.getElementById("activeFilters").textContent = active.length ? `Active: ${active.join(" | ")}` : "";
 
         renderCards(pageItems);
@@ -1022,166 +996,116 @@
         const root = document.getElementById("filters");
         root.innerHTML = "";
 
-        for (const f of filters) {
-          const block = document.createElement("div");
-          block.className = "filterBlock";
+        // --- Dropdowns row: Country, Scope, Region ---
+        const dropdownRow = document.createElement("div");
+        dropdownRow.className = "filter-dropdowns";
 
-          // Column select
-          const colSelect = document.createElement("select");
-          const opt0 = document.createElement("option");
-          opt0.value = "";
-          opt0.textContent = "Filter by\u2026";
-          colSelect.appendChild(opt0);
-
-          const excludedFilterCols = ["other", "entity verified", "entry verified", "website"];
-          for (const h of headers) {
-            if (excludedFilterCols.includes(h.toLowerCase().trim())) continue;
-            const o = document.createElement("option");
-            o.value = h;
-            o.textContent = h;
-            if (f.col === h) o.selected = true;
-            colSelect.appendChild(o);
-          }
-
-          colSelect.addEventListener("change", () => {
-            f.col = colSelect.value;
-            f.selected = new Set();
-            f.search = "";
-            f.parentValue = "";
+        dropdownRow.appendChild(createDropdownGroup("Country", staticFilters["Country"],
+          uniqueValuesForColumn("Country"), (val) => {
+            staticFilters["Country"] = val;
             currentPage = 1;
             render();
-          });
+          }));
 
-          // Search box
-          const search = document.createElement("input");
-          search.type = "text";
-          search.placeholder = "Search values\u2026";
-          search.dataset.filterId = f.id;
-          search.value = f.search || "";
-          let _debounceTimer;
-          search.addEventListener("input", () => {
-            clearTimeout(_debounceTimer);
-            _debounceTimer = setTimeout(() => {
-              const cursorPos = search.selectionStart;
-              f.search = search.value;
-              renderFilters();
-              // Restore focus to the rebuilt search input
-              const rebuilt = document.querySelector(`input[data-filter-id="${f.id}"]`);
-              if (rebuilt) {
-                rebuilt.focus();
-                rebuilt.setSelectionRange(cursorPos, cursorPos);
-              }
-            }, 300);
-          });
+        dropdownRow.appendChild(createDropdownGroup("Scope", staticFilters["Scope"],
+          uniqueValuesForColumn("Scope"), (val) => {
+            staticFilters["Scope"] = val;
+            currentPage = 1;
+            render();
+          }));
 
-          // Values checklist
+        // Region text input
+        const regionGroup = document.createElement("div");
+        regionGroup.className = "filter-dropdown-group";
+        const regionLabel = document.createElement("label");
+        regionLabel.textContent = "Region";
+        const regionInput = document.createElement("input");
+        regionInput.type = "text";
+        regionInput.placeholder = "Search region\u2026";
+        regionInput.id = "regionFilterInput";
+        regionInput.value = staticFilters["Region"];
+        let regionTimer;
+        regionInput.addEventListener("input", () => {
+          clearTimeout(regionTimer);
+          regionTimer = setTimeout(() => {
+            const pos = regionInput.selectionStart;
+            staticFilters["Region"] = regionInput.value;
+            currentPage = 1;
+            render();
+            const el = document.getElementById("regionFilterInput");
+            if (el) { el.focus(); el.setSelectionRange(pos, pos); }
+          }, 300);
+        });
+        regionGroup.appendChild(regionLabel);
+        regionGroup.appendChild(regionInput);
+        dropdownRow.appendChild(regionGroup);
+
+        root.appendChild(dropdownRow);
+
+        // --- Checkbox grid: Type, Population Served, Services / Resources ---
+        const checkboxGrid = document.createElement("div");
+        checkboxGrid.className = "filter-checkbox-grid";
+
+        for (const col of ["Type", "Population Served", "Services / Resources"]) {
+          const section = document.createElement("div");
+          const title = document.createElement("div");
+          title.className = "filter-section-title";
+          title.textContent = col;
+          section.appendChild(title);
+
           const checklist = document.createElement("div");
           checklist.className = "checklist";
 
-          // Country pre-filter for Region
-          let countryDropdown = null;
-          if (f.col === "Region") {
-            const crMap = buildCountryRegionMap();
-            const countries = Object.keys(crMap).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
-            countryDropdown = document.createElement("select");
-            const allOpt = document.createElement("option");
-            allOpt.value = "";
-            allOpt.textContent = "All countries";
-            countryDropdown.appendChild(allOpt);
-            for (const c of countries) {
-              const o = document.createElement("option");
-              o.value = c;
-              o.textContent = c;
-              if (f.parentValue === c) o.selected = true;
-              countryDropdown.appendChild(o);
-            }
-            countryDropdown.addEventListener("change", () => {
-              f.parentValue = countryDropdown.value;
-              f.selected = new Set();
+          const allValues = uniqueValuesForColumn(col);
+          const isPopulation = col === "Population Served";
+
+          for (const v of allValues) {
+            const lab = document.createElement("label");
+            const cb = document.createElement("input");
+            cb.type = "checkbox";
+            cb.checked = staticFilters[col].has(v);
+            cb.addEventListener("change", () => {
+              if (cb.checked) staticFilters[col].add(v);
+              else staticFilters[col].delete(v);
               currentPage = 1;
               render();
             });
+            const span = document.createElement("span");
+            span.textContent = isPopulation ? formatPopulationValue(v) : v;
+            lab.appendChild(cb);
+            lab.appendChild(span);
+            checklist.appendChild(lab);
           }
 
-          if (!f.col) {
-            const p = document.createElement("div");
-            p.className = "muted";
-            p.textContent = "Select a field to see values.";
-            checklist.appendChild(p);
-          } else {
-            const allValues = f.col === "Region" && f.parentValue
-              ? uniqueValuesForColumn(f.col, "Country", f.parentValue)
-              : uniqueValuesForColumn(f.col);
-            const q = (f.search || "").trim().toLowerCase();
-            const shown = q ? allValues.filter(v => v.toLowerCase().includes(q)) : allValues;
-
-            const isPopulationServed = (f.col || "").toLowerCase().trim() === "population served";
-            for (const v of shown) {
-              const lab = document.createElement("label");
-              const cb = document.createElement("input");
-              cb.type = "checkbox";
-              cb.checked = f.selected.has(v);
-              cb.addEventListener("change", () => {
-                if (cb.checked) f.selected.add(v);
-                else f.selected.delete(v);
-                currentPage = 1;
-                render();
-              });
-
-              const span = document.createElement("span");
-              span.textContent = isPopulationServed ? formatPopulationValue(v) : v;
-              lab.appendChild(cb);
-              lab.appendChild(span);
-              checklist.appendChild(lab);
-            }
-
-            if (shown.length === 0) {
-              const p = document.createElement("div");
-              p.className = "muted";
-              p.textContent = "No values match your search.";
-              checklist.appendChild(p);
-            }
-          }
-
-          // Selected chips
-          const chips = document.createElement("div");
-          chips.className = "chips";
-          const isPopChip = (f.col || "").toLowerCase().trim() === "population served";
-          for (const v of Array.from(f.selected)) {
-            const chip = document.createElement("div");
-            chip.className = "chip";
-            chip.textContent = `${isPopChip ? formatPopulationValue(v) : v} \u00D7`;
-            chip.addEventListener("click", () => {
-              f.selected.delete(v);
-              currentPage = 1;
-              render();
-            });
-            chips.appendChild(chip);
-          }
-
-          // Remove filter button
-          const removeBtn = document.createElement("button");
-          removeBtn.className = "filter-remove-btn";
-          removeBtn.type = "button";
-          removeBtn.textContent = "Remove this filter";
-          removeBtn.addEventListener("click", () => {
-            filters = filters.filter(x => x.id !== f.id);
-            if (filters.length === 0) addFilter();
-            render();
-          });
-
-          block.appendChild(colSelect);
-          if (countryDropdown) block.appendChild(countryDropdown);
-          block.appendChild(search);
-          block.appendChild(checklist);
-          if (f.selected.size > 0) block.appendChild(chips);
-          block.appendChild(removeBtn);
-          root.appendChild(block);
+          section.appendChild(checklist);
+          checkboxGrid.appendChild(section);
         }
+
+        root.appendChild(checkboxGrid);
       }
 
-      function addFilter() {
-        filters.push({ id: `f${nextId++}`, col: "", selected: new Set(), search: "", parentValue: "" });
+      function createDropdownGroup(label, currentValue, options, onChange) {
+        const group = document.createElement("div");
+        group.className = "filter-dropdown-group";
+        const lbl = document.createElement("label");
+        lbl.textContent = label;
+        group.appendChild(lbl);
+
+        const select = document.createElement("select");
+        const allOpt = document.createElement("option");
+        allOpt.value = "";
+        allOpt.textContent = "All";
+        select.appendChild(allOpt);
+        for (const v of options) {
+          const o = document.createElement("option");
+          o.value = v;
+          o.textContent = v;
+          if (v === currentValue) o.selected = true;
+          select.appendChild(o);
+        }
+        select.addEventListener("change", () => onChange(select.value));
+        group.appendChild(select);
+        return group;
       }
 
       // ==================== Wix Messaging ====================
@@ -1193,7 +1117,6 @@
           rows = Array.isArray(msg.rows) ? msg.rows : [];
           headers = Array.isArray(msg.headers) ? msg.headers : Object.keys(rows[0] || {});
           currentPage = 1;
-          if (filters.length === 0) addFilter();
           render();
         }
 
@@ -1204,10 +1127,10 @@
       };
 
       function notifyWixFilters() {
-        const payload = filters.map(f => ({
-          col: f.col,
-          values: Array.from(f.selected || [])
-        }));
+        const payload = {};
+        for (const [col, val] of Object.entries(staticFilters)) {
+          payload[col] = val instanceof Set ? Array.from(val) : val;
+        }
         parent.postMessage({ type: "FILTERS_CHANGED", filters: payload }, "*");
       }
 
@@ -1221,15 +1144,14 @@
         toggle.classList.toggle("collapsed");
       });
 
-      // Add filter
-      document.getElementById("addFilter").addEventListener("click", () => {
-        addFilter();
-        render();
-      });
-
       // Clear all filters
       document.getElementById("clearAll").addEventListener("click", () => {
-        filters = [{ id: `f${nextId++}`, col: "", selected: new Set(), search: "", parentValue: "" }];
+        staticFilters["Country"] = "";
+        staticFilters["Scope"] = "";
+        staticFilters["Region"] = "";
+        staticFilters["Type"] = new Set();
+        staticFilters["Population Served"] = new Set();
+        staticFilters["Services / Resources"] = new Set();
         currentPage = 1;
         render();
       });
