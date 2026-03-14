@@ -137,6 +137,45 @@ class SheetsService:
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
+    def write_row(self, sheet_name: str, columns: str, row: List[Any]):
+        """Write a row to the next empty position using explicit update.
+
+        Unlike update_sheet (which uses append and can be affected by Google
+        Sheets Table features), this reads the sheet to find the next empty
+        row and writes directly to that cell range.
+        """
+        if not self.settings.sheet_id:
+            raise HTTPException(status_code=500, detail="SHEET_ID env var is not set")
+        try:
+            service = self._get_service()
+            # Read column A to find the next empty row
+            col_a = f"{sheet_name}!A:A"
+            resp = (
+                service.spreadsheets()
+                .values()
+                .get(
+                    spreadsheetId=self.settings.sheet_id,
+                    range=col_a,
+                    valueRenderOption="UNFORMATTED_VALUE",
+                )
+                .execute()
+            )
+            existing_rows = len(resp.get("values", []))
+            next_row = existing_rows + 1
+
+            target_range = f"{sheet_name}!{columns}{next_row}"
+            service.spreadsheets().values().update(
+                spreadsheetId=self.settings.sheet_id,
+                range=target_range,
+                valueInputOption="USER_ENTERED",
+                body={"values": [row]},
+            ).execute()
+            return {"message": "Row written successfully", "range": target_range}
+        except HttpError as e:
+            raise HTTPException(status_code=502, detail=f"Google Sheets API error: {e}")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
 
 # Global service instance
 _sheets_service: SheetsService | None = None

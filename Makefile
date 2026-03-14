@@ -7,6 +7,16 @@ SERVICE  := wix-fastapi-nabis
 
 REGISTRY := $(REGION)-docker.pkg.dev/$(PROJECT)/$(REPO)/$(IMAGE)
 TAG      ?= latest
+ENV_FILE ?= .env
+
+# Read .env and build a comma-separated KEY=VALUE string for --set-env-vars.
+# Strips comments, blank lines, and the GOOGLE_APPLICATION_CREDENTIALS key
+# (Cloud Run uses ADC instead).
+ENV_VARS := $(shell grep -v '^\s*\#' $(ENV_FILE) 2>/dev/null \
+	| grep -v '^\s*$$' \
+	| grep -v '^GOOGLE_APPLICATION_CREDENTIALS' \
+	| grep '=' \
+	| paste -sd ',' -)
 
 # ─── Local ────────────────────────────────────────────────
 .PHONY: install dev lint docker-up docker-down
@@ -34,12 +44,13 @@ build:                  ## Build image via Cloud Build
 
 push: build             ## Alias: build already pushes to Artifact Registry
 
-deploy:                 ## Deploy image to Cloud Run
+deploy:                 ## Deploy image to Cloud Run with .env vars
 	gcloud run deploy $(SERVICE) \
 		--image $(REGISTRY):$(TAG) \
 		--region $(REGION) \
 		--project $(PROJECT) \
-		--allow-unauthenticated
+		--allow-unauthenticated \
+		--set-env-vars "$(ENV_VARS)"
 
 deploy-all: build deploy ## Build + deploy in one step
 

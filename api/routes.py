@@ -17,13 +17,8 @@ router = APIRouter()
 
 
 def _utc_stamp() -> str:
-    """Return the current UTC time as a text-forced string for Google Sheets.
-
-    The leading apostrophe tells the Sheets API (USER_ENTERED mode) to store
-    the value as plain text, preventing auto-conversion to a serial number.
-    The apostrophe is not displayed in the cell.
-    """
-    return "'" + datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    """Return the current UTC time as a formatted string."""
+    return datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
 
 def _is_verified(value: Any) -> bool:
@@ -132,7 +127,7 @@ def submit_entry(request: SubmitEntryRequest) -> dict[str, Any]:
     }
     row = [data.get(h, "") for h in headers]
 
-    sheets_service.update_sheet(settings.entries_range, [row])
+    sheets_service.write_row("New Entries to Verify", "A", row)
     return {
         "message": "Entry submitted for verification",
         "range": settings.entries_range,
@@ -151,7 +146,7 @@ def submit_comment(request: SubmitCommentRequest) -> dict[str, Any]:
 
     row = [_utc_stamp(), request.comment]
 
-    sheets_service.update_sheet(settings.comments_range, [row])
+    sheets_service.write_row("Comments", "A", row)
     return {
         "message": "Comment submitted successfully",
         "range": settings.comments_range,
