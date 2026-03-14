@@ -1,58 +1,67 @@
-let HEADERS = [];
+const BASE_URL = "https://wix-fastapi-nabis-545041871674.us-east1.run.app";
 
-const SHEET_URL = "https://wix-fastapi-nabis-545041871674.us-east1.run.app/sheet";
-const RANGE_TO_APPEND = "Sheet1!A:J";
+const FETCH_HEADERS = {
+  "Content-Type": "application/json",
+  "ngrok-skip-browser-warning": "true",
+  "Accept": "application/json"
+};
 
 
-$w.onReady(async function () {
-  // Load headers so we know the column order for submissions
-  await loadHeaders();
-
-  $w("#sendBtn").onClick(async () => {
-    try {
-      if (!hasRequiredInputs()) {
-        if ($w("#formStatusText")) {
-          $w("#formStatusText").text = "Please fill all required fields.";
-        }
-        return;
-      }
-
-      if ($w("#formStatusText")) $w("#formStatusText").text = "Sending...";
-      $w("#sendBtn").disable();
-
-      const rowObj = buildRowObjectFromForm();
-      const rowValues = HEADERS.map(h => normalizeCell(rowObj[h]));
-
-      await appendRowToBackend(rowValues);
-
-      if ($w("#formStatusText")) $w("#formStatusText").text = "Saved!";
-      clearFormInputs();
-    } catch (e) {
-      console.error(e);
-      if ($w("#formStatusText")) $w("#formStatusText").text = `Error: ${e.message || e}`;
-    } finally {
-      $w("#sendBtn").enable();
-    }
-  });
+$w.onReady(function () {
+  $w("#sendBtn").onClick(handleEntrySubmit);
+  $w("#commentBtn").onClick(handleCommentSubmit);
 });
 
-async function loadHeaders() {
-  const res = await fetch(SHEET_URL + "?header_row=1", {
-    method: "GET",
-    headers: {
-      "ngrok-skip-browser-warning": "true",
-      "Accept": "application/json"
-    }
-  });
 
-  const text = await res.text();
-  if (!res.ok) throw new Error(`HTTP ${res.status}: ${text.slice(0, 120)}`);
+async function handleEntrySubmit() {
+  const entryData = buildEntryData();
 
-  const payload = JSON.parse(text);
-  HEADERS = (payload.headers || []).filter(h => (h || "").trim().length > 0);
+  if (!hasAnyEntryInput(entryData)) {
+    setStatus("#formStatusText", "Please fill at least one field.");
+    return;
+  }
+
+  setStatus("#formStatusText", "Sending...");
+  $w("#sendBtn").disable();
+
+  try {
+    await postJSON("/entry", { data: stripEmpty(entryData) });
+    setStatus("#formStatusText", "Saved!");
+    clearFormInputs();
+  } catch (e) {
+    console.error(e);
+    setStatus("#formStatusText", `Error: ${e.message || e}`);
+  } finally {
+    $w("#sendBtn").enable();
+  }
 }
 
-function buildRowObjectFromForm() {
+
+async function handleCommentSubmit() {
+  const comment = ($w("#commentInput").value || "").trim();
+
+  if (!comment) {
+    setStatus("#commentStatusText", "Please enter a comment.");
+    return;
+  }
+
+  setStatus("#commentStatusText", "Sending...");
+  $w("#commentBtn").disable();
+
+  try {
+    await postJSON("/comment", { comment });
+    setStatus("#commentStatusText", "Comment submitted!");
+    $w("#commentInput").value = "";
+  } catch (e) {
+    console.error(e);
+    setStatus("#commentStatusText", `Error: ${e.message || e}`);
+  } finally {
+    $w("#commentBtn").enable();
+  }
+}
+
+
+function buildEntryData() {
   return {
     "Organization Name": ($w("#orgNameInput").value || "").trim(),
     "Country": $w("#countryDropdown").value || "",
@@ -62,41 +71,49 @@ function buildRowObjectFromForm() {
     "Population Served": joinMulti($w("#populationCheckbox").value),
     "Services / Resources": joinMulti($w("#servicesCheckbox").value),
     "Website": ($w("#websiteInput").value || "").trim(),
-    "Other": ($w("#otherInput").value || "").trim(),
-    "Entry verified": "False"
+    "Other": ($w("#otherInput").value || "").trim()
   };
 }
 
+
+function hasAnyEntryInput(data) {
+  return Object.values(data).some(v => (v || "").trim().length > 0);
+}
+
+
 function joinMulti(arr) {
-  if (!arr || !Array.isArray(arr) || arr.length === 0) return "";
+  if (!Array.isArray(arr) || arr.length === 0) return "";
   return arr.join(", ");
 }
 
-function normalizeCell(v) {
-  return (v === undefined || v === null) ? "" : v;
+
+function stripEmpty(data) {
+  const result = {};
+  for (const [k, v] of Object.entries(data)) {
+    if ((v || "").trim()) result[k] = v;
+  }
+  return result;
 }
 
-async function appendRowToBackend(rowValues) {
-  const body = {
-    range: RANGE_TO_APPEND,
-    value: [rowValues]
-  };
 
-  const res = await fetch(SHEET_URL, {
+async function postJSON(path, body) {
+  const res = await fetch(BASE_URL + path, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "ngrok-skip-browser-warning": "true",
-      "Accept": "application/json"
-    },
+    headers: FETCH_HEADERS,
     body: JSON.stringify(body)
   });
 
   const text = await res.text();
-  if (!res.ok) throw new Error(`POST /sheet failed HTTP ${res.status}: ${text.slice(0, 200)}`);
+  if (!res.ok) throw new Error(`POST ${path} failed HTTP ${res.status}: ${text.slice(0, 200)}`);
 
   try { return JSON.parse(text); } catch { return { message: text }; }
 }
+
+
+function setStatus(selector, message) {
+  if ($w(selector)) $w(selector).text = message;
+}
+
 
 function clearFormInputs() {
   $w("#orgNameInput").value = "";
@@ -110,16 +127,4 @@ function clearFormInputs() {
   $w("#typeCheckbox").value = [];
   $w("#populationCheckbox").value = [];
   $w("#servicesCheckbox").value = [];
-}
-
-function hasRequiredInputs() {
-  return (
-    ($w("#orgNameInput").value || "").trim().length > 0 &&
-    ($w("#countryDropdown").value || "").trim().length > 0 &&
-    ($w("#scopeDropdown").value || "").trim().length > 0 &&
-    ($w("#regionInput").value || "").trim().length > 0 &&
-    (($w("#typeCheckbox").value || []).length > 0) &&
-    (($w("#populationCheckbox").value || []).length > 0) &&
-    (($w("#servicesCheckbox").value || []).length > 0)
-  );
 }
