@@ -82,7 +82,7 @@ The Wix page code (`Wix_page.js`) fetches JSON from the FastAPI backend, then pu
 |----------|----------|---------|---------|
 | `SHEET_ID` | Yes | `""` | Google Spreadsheet ID |
 | `DEFAULT_RANGE` | No | `Sheet1!A:Z` | Default A1 notation range |
-| `ENTRIES_RANGE` | No | `New Entries to Verify!A:M` | Range for unverified entry submissions |
+| `ENTRIES_RANGE` | No | `New Entries to Verify!A:K` | Range for unverified entry submissions |
 | `COMMENTS_RANGE` | No | `Comments!A:B` | Range for standalone comments |
 | `GOOGLE_APPLICATION_CREDENTIALS` | No (on GCP) | `""` | Path to service account JSON |
 

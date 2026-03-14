@@ -17,8 +17,13 @@ router = APIRouter()
 
 
 def _utc_stamp() -> str:
-    """Return the current UTC time as a formatted string."""
-    return datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    """Return the current UTC time as a text-forced string for Google Sheets.
+
+    The leading apostrophe tells the Sheets API (USER_ENTERED mode) to store
+    the value as plain text, preventing auto-conversion to a serial number.
+    The apostrophe is not displayed in the cell.
+    """
+    return "'" + datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
 
 def _is_verified(value: Any) -> bool:

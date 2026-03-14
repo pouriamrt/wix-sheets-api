@@ -18,7 +18,7 @@ class Settings:
         self.sheet_id: str = os.getenv("SHEET_ID", "")
         self.default_range: str = os.getenv("DEFAULT_RANGE", "Sheet1!A:Z")
         self.entries_range: str = os.getenv(
-            "ENTRIES_RANGE", "New Entries to Verify!A:M"
+            "ENTRIES_RANGE", "New Entries to Verify!A:K"
         )
         self.comments_range: str = os.getenv("COMMENTS_RANGE", "Comments!A:B")
         self.scopes: list[str] = ["https://www.googleapis.com/auth/spreadsheets"]
