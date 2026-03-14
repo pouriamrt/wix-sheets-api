@@ -9,17 +9,6 @@ REGISTRY := $(REGION)-docker.pkg.dev/$(PROJECT)/$(REPO)/$(IMAGE)
 TAG      ?= latest
 ENV_FILE ?= .env
 
-# Read .env and build a @@-delimited KEY=VALUE string for --set-env-vars.
-# Strips comments, blank lines, quotes, and GOOGLE_APPLICATION_CREDENTIALS
-# (Cloud Run uses ADC instead). Uses ^@@^ delimiter to support values with
-# spaces and special characters.
-ENV_VARS := $(shell grep -v '^\s*\#' $(ENV_FILE) 2>/dev/null \
-	| grep -v '^\s*$$' \
-	| grep -v '^GOOGLE_APPLICATION_CREDENTIALS' \
-	| grep '=' \
-	| sed 's/"//g' \
-	| awk '{printf "%s%s", sep, $$0; sep="@@"}')
-
 # ─── Local ────────────────────────────────────────────────
 .PHONY: install dev lint docker-up docker-down
 
@@ -39,20 +28,25 @@ docker-down:            ## Stop Docker Compose
 	docker compose down
 
 # ─── Deploy ───────────────────────────────────────────────
-.PHONY: build push deploy deploy-all logs
+.PHONY: build push deploy deploy-all
 
 build:                  ## Build image via Cloud Build
 	gcloud builds submit --config cloudbuild.yaml --project $(PROJECT)
 
 push: build             ## Alias: build already pushes to Artifact Registry
 
-deploy:                 ## Deploy image to Cloud Run with .env vars
-	gcloud run deploy $(SERVICE) \
-		--image $(REGISTRY):$(TAG) \
-		--region $(REGION) \
-		--project $(PROJECT) \
-		--allow-unauthenticated \
-		--set-env-vars "^@@^$(ENV_VARS)"
+# Generate a YAML env-vars file from .env, stripping comments, quotes,
+# and GOOGLE_APPLICATION_CREDENTIALS (Cloud Run uses ADC instead).
+.env.yaml: $(ENV_FILE)
+	@grep -v '^\s*\#' $(ENV_FILE) 2>/dev/null \
+		| grep -v '^\s*$$' \
+		| grep -v '^GOOGLE_APPLICATION_CREDENTIALS' \
+		| grep '=' \
+		| sed 's/"//g' \
+		| sed 's/=\(.*\)/: "\1"/' > .env.yaml
+
+deploy: .env.yaml       ## Deploy image to Cloud Run with .env vars
+	gcloud run deploy $(SERVICE) --image $(REGISTRY):$(TAG) --region $(REGION) --project $(PROJECT) --allow-unauthenticated --env-vars-file .env.yaml
 
 deploy-all: build deploy ## Build + deploy in one step
 
