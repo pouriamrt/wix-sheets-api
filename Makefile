@@ -9,14 +9,16 @@ REGISTRY := $(REGION)-docker.pkg.dev/$(PROJECT)/$(REPO)/$(IMAGE)
 TAG      ?= latest
 ENV_FILE ?= .env
 
-# Read .env and build a comma-separated KEY=VALUE string for --set-env-vars.
-# Strips comments, blank lines, and the GOOGLE_APPLICATION_CREDENTIALS key
-# (Cloud Run uses ADC instead).
+# Read .env and build a @@-delimited KEY=VALUE string for --set-env-vars.
+# Strips comments, blank lines, quotes, and GOOGLE_APPLICATION_CREDENTIALS
+# (Cloud Run uses ADC instead). Uses ^@@^ delimiter to support values with
+# spaces and special characters.
 ENV_VARS := $(shell grep -v '^\s*\#' $(ENV_FILE) 2>/dev/null \
 	| grep -v '^\s*$$' \
 	| grep -v '^GOOGLE_APPLICATION_CREDENTIALS' \
 	| grep '=' \
-	| paste -sd ',' -)
+	| sed 's/"//g' \
+	| awk '{printf "%s%s", sep, $$0; sep="@@"}')
 
 # ─── Local ────────────────────────────────────────────────
 .PHONY: install dev lint docker-up docker-down
@@ -50,7 +52,7 @@ deploy:                 ## Deploy image to Cloud Run with .env vars
 		--region $(REGION) \
 		--project $(PROJECT) \
 		--allow-unauthenticated \
-		--set-env-vars "$(ENV_VARS)"
+		--set-env-vars "^@@^$(ENV_VARS)"
 
 deploy-all: build deploy ## Build + deploy in one step
 
