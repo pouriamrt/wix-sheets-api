@@ -167,7 +167,7 @@ class SheetsService:
             service.spreadsheets().values().update(
                 spreadsheetId=self.settings.sheet_id,
                 range=target_range,
-                valueInputOption="USER_ENTERED",
+                valueInputOption="RAW",
                 body={"values": [row]},
             ).execute()
             return {"message": "Row written successfully", "range": target_range}
